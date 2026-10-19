@@ -74,10 +74,11 @@ def test_waveform_svg_emits_mirrored_wave_and_markers(tmp_path):
     assert svg.startswith("<svg")
     # mirrored peaks -> two polylines
     assert svg.count("<polyline") == 2
-    # cue markers with labels
-    assert svg.count("<line") == 2
+    # cue markers with labels (dasharray lines; not the linearGradient tag)
+    assert svg.count("<line ") == 2
     assert "Neon" in svg and "DJ" in svg
     assert "#a6503c" in svg  # terra accent
+    assert "url(#jkwave)" in svg  # gradient stroke
 
 
 def test_waveform_svg_handles_garbage_path():

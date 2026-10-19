@@ -114,10 +114,16 @@ def waveform_svg(path: str, width: int = 640, height: int = 120,
         f"{i * step_x:.1f},{mid + max(0.02, p) * amp:.1f}" for i, p in reversed(list(enumerate(peaks)))
     )
     parts = [
-        "<svg viewBox='0 0 %d %d' width='100%%' xmlns='http://www.w3.org/2000/svg'>" % (width, height),
-        "<polyline points='%s' fill='none' stroke='#a6503c' stroke-width='1.6' "
+        "<svg viewBox='0 0 %d %d' width='100%%' xmlns='http://www.w3.org/2000/svg'>"
+        % (width, height),
+        "<defs><linearGradient id='jkwave' x1='0' y1='0' x2='1' y2='0'>"
+        "<stop offset='0' stop-color='#a6503c'/>"
+        "<stop offset='0.5' stop-color='#c08a2d'/>"
+        "<stop offset='1' stop-color='#a6503c'/>"
+        "</linearGradient></defs>",
+        "<polyline points='%s' fill='none' stroke='url(#jkwave)' stroke-width='1.6' "
         "stroke-linejoin='round' opacity='0.95'/>" % top,
-        "<polyline points='%s' fill='none' stroke='#a6503c' stroke-width='1.6' "
+        "<polyline points='%s' fill='none' stroke='url(#jkwave)' stroke-width='1.6' "
         "stroke-linejoin='round' opacity='0.95'/>" % bottom,
     ]
     if markers:

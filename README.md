@@ -9,7 +9,7 @@ for agentic use and is **never** used by this app.
 
 ## Live demo
 
-🔗 **https://d83a8dbdbf85c07227.gradio.live** — the app currently running.
+🔗 **https://a077115094a743378d.gradio.live** — the app currently running.
 
 > Share links rotate: this public URL dies with the app process and expires
 > automatically (~1 week). When it stops working, refresh it by launching

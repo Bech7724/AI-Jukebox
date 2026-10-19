@@ -387,35 +387,70 @@ theme = gr.themes.Base(
 )
 
 _UI_CSS = """
-.gradio-container { max-width: 1180px !important; margin: 0 auto !important; }
+/* Display type for the big headings (falls back to Inter if offline). */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;800&display=swap');
+.gradio-container { max-width: 1180px !important; margin: 0 auto !important;
+  background: radial-gradient(1400px 560px at 50% -140px, #fdf7e9 0%, #f5f1e8 62%) !important; }
 button { border-radius: 999px !important; }
 blockquote { border-left: 3px solid #a6503c !important; }
 footer { color: #7a7264 !important; }
 
+/* ---- cards: soft, rounded, lifted ---- */
+.gradio-container .block { border-radius: 14px !important;
+  box-shadow: 0 1px 4px rgba(74, 58, 28, 0.08); border-color: #e7dfcb !important; }
+
 /* ---- hero header ---- */
-.jk-hero { padding: 26px 4px 18px; border-bottom: 2px solid #e2dac6; margin-bottom: 18px; }
-.jk-hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.4px; color: #2e2a24; }
-.jk-hero-title .city { color: #8a8172; font-weight: 600; }
-.jk-hero-sub { color: #6e675a; font-size: 14px; margin-top: 6px; max-width: 780px; line-height: 1.55; }
-.jk-hero-chip { display: inline-block; margin-top: 10px; background: #f0e8d6; color: #7a5f2e;
-  font-size: 12.5px; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid #e2dac6; }
+.jk-hero { position: relative; padding: 28px 4px 20px; margin-bottom: 22px; }
+.jk-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 3px;
+  background: linear-gradient(90deg, transparent, #a6503c 20%, #e7c06a 50%, #a6503c 80%, transparent); }
+.jk-hero-title { font-size: 33px; font-weight: 800; letter-spacing: -0.6px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  background: linear-gradient(90deg, #7a4528 8%, #a6503c 32%, #c2573d 58%, #d9a441 92%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.jk-hero-title .city { color: #8a8172; font-weight: 600; background: none;
+  -webkit-text-fill-color: #8a8172; }
+.jk-hero-sub { color: #6e675a; font-size: 14px; margin-top: 8px; max-width: 780px; line-height: 1.6; }
+.jk-hero-chip { display: inline-block; margin-top: 12px; background: linear-gradient(135deg, #f3e3b8, #ecd49a);
+  color: #6b4e13; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px;
+  border: 1px solid #e0c47c; box-shadow: 0 2px 8px rgba(180, 140, 60, 0.3); }
 
 /* ---- numbered section banners ---- */
-.jk-section { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px;
-  padding-bottom: 10px; border-bottom: 1px solid #e2dac6; }
-.jk-badge { flex: none; width: 34px; height: 34px; border-radius: 50%;
-  background: #a6503c; color: #fff; font-weight: 800; font-size: 17px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 2px 6px rgba(166, 80, 60, 0.35); }
-.jk-section-title { font-size: 20px; font-weight: 800; color: #2e2a24; letter-spacing: -0.2px; }
-.jk-section-desc { color: #7a7264; font-size: 13px; margin-top: 1px; }
+.jk-section { display: flex; align-items: center; gap: 13px; margin: 28px 0 14px;
+  padding-bottom: 12px; }
+.jk-badge { flex: none; width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, #ca7047, #a6503c); color: #fff; font-weight: 800;
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(166, 80, 60, 0.45); }
+.jk-section-title { font-size: 21px; font-weight: 800; color: #2e2a24; letter-spacing: -0.2px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif; }
+.jk-section-desc { color: #7a7264; font-size: 13px; margin-top: 2px; }
 
-/* ---- group mini-captions ---- */
-.jk-group-cap { font-size: 13px; font-weight: 700; color: #a6503c; text-transform: uppercase;
-  letter-spacing: 0.6px; margin-bottom: 2px; }
+/* ---- group mini-captions: accent bar + soft wash ---- */
+.jk-group-cap { font-size: 12.5px; font-weight: 800; color: #96603e; text-transform: uppercase;
+  letter-spacing: 0.8px; padding: 5px 10px; border-left: 3px solid #a6503c;
+  background: linear-gradient(90deg, rgba(166, 80, 60, 0.09), rgba(166, 80, 60, 0)); }
 
-/* ---- hero actions ---- */
-button.primary { font-size: 15px !important; font-weight: 700 !important; }
+/* ---- hero actions: pulse + gradient ---- */
+@keyframes jk-pulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(166, 80, 60, 0.30); }
+  50% { box-shadow: 0 6px 26px rgba(214, 130, 80, 0.55); }
+}
+button.primary { background: linear-gradient(135deg, #b25a44, #a6503c 60%, #bd6a45) !important;
+  animation: jk-pulse 2.8s ease-in-out infinite; transition: transform 0.15s ease; }
+button.primary:hover { transform: translateY(-1px); }
+
+/* ---- golden dice ---- */
+.jk-surprise { background: linear-gradient(135deg, #f0d9a0, #d9a441) !important;
+  color: #4a3508 !important; border-color: #cf9a38 !important; font-weight: 700 !important;
+  box-shadow: 0 3px 12px rgba(200, 150, 60, 0.4) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.jk-surprise:hover { transform: translateY(-1px) rotate(-1deg);
+  box-shadow: 0 6px 18px rgba(200, 150, 60, 0.55) !important; }
+
+/* ---- shuffle: terra kiss on hover ---- */
+.jk-shuffle { transition: all 0.15s ease; }
+.jk-shuffle:hover { border-color: #a6503c !important; color: #a6503c !important;
+  box-shadow: 0 2px 8px rgba(166, 80, 60, 0.2) !important; }
 """
 
 
@@ -428,7 +463,8 @@ def _hero_html() -> str:
         "<div class='jk-hero-title'>🏔️ AI Jukebox <span class='city'>· Boulder, Colorado</span></div>"
         "<div class='jk-hero-sub'>A Flatirons-inspired jukebox — rock, sand &amp; sky on one "
         "screen. Songs by ACE-Step (9007), covers by FLUX (9006), lyrics &amp; DJ scripts by "
-        "Qwen (9001), DJ voice by Chatterbox (9008). Port 9000 is never used.</div>"
+        "Qwen (9001), DJ voice by Chatterbox (9008). Port 9000 is never used. "
+        "Press 🎲 <b>Surprise me</b> and let the booth decide.</div>"
         + chip + "</div>"
     )
 
@@ -477,7 +513,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
                                       value="Auto")
     with gr.Row():
         create_btn = gr.Button("🎬 Generate song + cover", variant="primary", scale=3)
-        surprise_btn = gr.Button("🎲 Surprise me", scale=1)
+        surprise_btn = gr.Button("🎲 Surprise me", scale=1, elem_classes=["jk-surprise"])
     with gr.Accordion("Custom lyrics (optional — vocal tracks; blank = AI-written)",
                       open=False):
         lyrics_box = gr.Textbox(lines=5, placeholder="[Verse 1]\n…", label="")
@@ -503,7 +539,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
                                  type="filepath")
         with gr.Row():
             build_btn = gr.Button("🎙️ Build the show", variant="primary", scale=2)
-            shuffle_btn = gr.Button("🔀 Shuffle queue", scale=1)
+            shuffle_btn = gr.Button("🔀 Shuffle queue", scale=1, elem_classes=["jk-shuffle"])
     show_audio = gr.Audio(label="Queue player (continuous mix)", type="filepath",
                           autoplay=True, elem_id="show-player")
     jukebox_viz = gr.HTML(_viz_html("", []))
