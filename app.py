@@ -289,5 +289,4 @@ if __name__ == "__main__":
         server_name=os.environ.get("AIJ_HOST", "127.0.0.1"),
         server_port=int(os.environ.get("AIJ_PORT", "7860")),
         share=os.environ.get("AIJ_SHARE", "0") == "1",
-        analytics_enabled=False,
     )

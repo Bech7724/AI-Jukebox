@@ -1,0 +1,110 @@
+{
+  "f1_vocal": {
+    "input": {
+      "title": "Golden Hour",
+      "genre": "chillhop",
+      "mood": "warm sunset, easygoing",
+      "duration": 12,
+      "vocal": true
+    },
+    "expected": "playable MP3 in library, AI lyrics, metadata",
+    "actual": {
+      "lyrics_words": 128,
+      "audio_bytes": 192812,
+      "mp3_magic": "ID3",
+      "bpm": 88,
+      "key": "E major",
+      "music_seconds": 5.8,
+      "total_seconds": 74.6
+    },
+    "status": "PASS"
+  },
+  "f1_instrumental": {
+    "input": {
+      "title": "Empty Streets",
+      "genre": "ambient",
+      "mood": "quiet rainfall",
+      "duration": 10,
+      "vocal": false
+    },
+    "expected": "no lyrics sent (instrumental)",
+    "actual": {
+      "lyrics_chars": 0,
+      "vocal_flag": false,
+      "lyrics_mode": "INSTRUMENTAL"
+    },
+    "status": "PASS"
+  },
+  "f2_cover": {
+    "input": {
+      "track": "Golden Hour",
+      "prompt_source": "LLM cover prompt (100% FLUX)"
+    },
+    "expected": "new FLUX cover per track, displayed with the track",
+    "actual": {
+      "exists": true,
+      "png_size_px": [
+        1024,
+        1024
+      ],
+      "prompt": "Lo-fi chillhop aesthetic captures a serene car interior bathed in amber light streaming through open"
+    },
+    "status": "PASS"
+  },
+  "f3_dj_default": {
+    "input": {
+      "tracks": [
+        "Golden Hour",
+        "Empty Streets"
+      ],
+      "voice": "default (no upload)"
+    },
+    "expected": "Qwen commentary spoken by Chatterbox between songs; one continuous mix",
+    "actual": {
+      "intros": [
+        161324,
+        164396
+      ],
+      "intro_mp3_magic": "ID3",
+      "segments": 4,
+      "cue_times": [
+        0.0,
+        10.35,
+        22.7,
+        33.25
+      ],
+      "mix_seconds": 43.2
+    },
+    "status": "PASS"
+  },
+  "f3_dj_cloned_voice": {
+    "input": {
+      "voice": "cloned from a base64 MP3 reference (as the UI upload does)"
+    },
+    "expected": "intro generated in the cloned voice, saved as MP3",
+    "actual": {
+      "script_words": 36,
+      "mp3_bytes": 171692,
+      "mp3_magic": "ID3"
+    },
+    "status": "PASS"
+  },
+  "fail_auth": {
+    "input": {
+      "api_key": "wrong-key"
+    },
+    "expected": "understandable ServiceError; UI shows gr.Error, nothing saved",
+    "actual": "HTTP 401 from http://dobolyi.com:9008/v1/audio/speech: {\"error\":{\"message\":\"Missing or invalid API key.\",\"type\":\"authent",
+    "status": "PASS (recoverable: fix .env key, retry)"
+  },
+  "fail_llm_reasoning_budget": {
+    "input": {
+      "max_tokens": 1536,
+      "temperature": 0.9,
+      "note": "observed 2026-10-19"
+    },
+    "expected": "non-empty lyrics",
+    "actual": "finish_reason=length, reasoning_tokens == max_tokens, content=None (4/4 attempts). Fixed: auto-retry with doubled budget; + retry loop.",
+    "status": "INVESTIGATED + FIXED"
+  }
+}
