@@ -203,52 +203,63 @@ def refresh_library():
 
 # ---------------------------------------------------------------------- UI
 
-# Spotify-vibe dark theme with CU Boulder black & gold.
-_GOLD = "#cfb87c"          # CU gold
-_SPOTIFY_DARK = "#121212"  # near-black, like a dark-mode player
-_CARD = "#1a1a1a"
+# Flatirons Boulder theme: warm paper, terracotta rock, sand, sage — a light,
+# high-contrast palette that is easy to read (no black-on-dark).
+_PAPER = "#f5f1e8"            # warm, soft background
+_CARD = "#ffffff"
+_INK = "#2e2a24"              # warm near-black text
+_MUTED = "#6e675a"
+_TERRA = "#a6503c"            # flatiron red-rock (primary buttons/accents)
+_TERRA_HOVER = "#8e4231"
+_SAND = "#e2dac6"             # borders
+_SKY = "#4a7b96"              # link / info blue (Boulder sky)
 
 theme = gr.themes.Base(
-    primary_hue=gr.themes.colors.amber,
-    neutral_hue=gr.themes.colors.gray,
+    primary_hue=gr.themes.colors.orange,
+    neutral_hue=gr.themes.colors.stone,
     font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "sans-serif"],
 ).set(
-    body_background_fill=_SPOTIFY_DARK,
-    body_background_fill_dark=_SPOTIFY_DARK,
+    body_background_fill=_PAPER,
+    body_background_fill_dark=_PAPER,
+    background_fill_secondary=_PAPER,
     block_background_fill=_CARD,
     block_background_fill_dark=_CARD,
-    block_border_color="#2b2b2b",
-    block_label_text_color="#e8e6e1",
-    block_title_text_color="#f5f3ec",
-    body_text_color="#d9d7d1",
-    input_background_fill="#1f1f1f",
-    input_border_color="#3a3a3a",
-    button_primary_background_fill=_GOLD,
-    button_primary_background_fill_hover=_GOLD,
-    button_primary_text_color="#111111",
-    button_primary_border_color=_GOLD,
-    button_secondary_background_fill="#222222",
-    button_secondary_text_color="#e8e6e1",
-    slider_color=_GOLD,
-    slider_color_dark=_GOLD,
-    border_color_primary="#2b2b2b",
-    border_color_accent=_GOLD,
-    link_text_color=_GOLD,
-    link_text_color_dark=_GOLD,
+    block_border_color=_SAND,
+    block_label_background_fill=_PAPER,
+    block_label_text_color=_MUTED,
+    block_title_text_color=_INK,
+    body_text_color=_INK,
+    input_background_fill=_CARD,
+    input_border_color=_SAND,
+    button_primary_background_fill=_TERRA,
+    button_primary_background_fill_hover=_TERRA_HOVER,
+    button_primary_text_color="#ffffff",
+    button_primary_border_color=_TERRA,
+    button_secondary_background_fill=_CARD,
+    button_secondary_text_color=_INK,
+    button_secondary_border_color=_SAND,
+    slider_color=_TERRA,
+    slider_color_dark=_TERRA,
+    border_color_primary=_SAND,
+    border_color_accent=_TERRA,
+    link_text_color=_SKY,
+    link_text_color_dark=_SKY,
 )
 
 _UI_CSS = """
 .gradio-container { max-width: 1150px !important; margin: 0 auto !important; }
 button { border-radius: 999px !important; }
-blockquote { border-left: 3px solid #cfb87c !important; }
+blockquote { border-left: 3px solid #a6503c !important; }
+h3 { color: #3a342c !important; border-left: 4px solid #a6503c; padding-left: 10px; }
+footer { color: #7a7264 !important; }
 """
 
-with gr.Blocks(title="AI Jukebox · CU Boulder", theme=theme, css=_UI_CSS) as demo:
+with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     gr.Markdown(
-        "# 🎵 **AI Jukebox** · University of Colorado Boulder\n"
-        "A Spotify-vibe jukebox in black & gold — one screen: song generation "
-        "(LLM 9001 · FLUX cover art 9006 · ACE-Step music 9007 · Chatterbox voice "
-        "9008). Port 9000 is never used.\n"
+        "# 🏔️ **AI Jukebox** · Boulder, Colorado\n"
+        "A Flatirons-inspired jukebox — rock, sand & sky on one screen: song "
+        "generation (LLM 9001 · FLUX cover art 9006 · ACE-Step music 9007 · "
+        "Chatterbox voice 9008). Port 9000 is never used.\n"
         + ("_3 sample tracks preloaded for instant playback._" if _seeded else "")
     )
 
@@ -306,7 +317,7 @@ with gr.Blocks(title="AI Jukebox · CU Boulder", theme=theme, css=_UI_CSS) as de
         delete_btn = gr.Button("🗑️ Delete", variant="stop")
         refresh_btn = gr.Button("↻ Refresh")
 
-    gr.Markdown("---\n🎓 **CU Boulder** · built with the class services on `dobolyi.com`")
+    gr.Markdown("---\n🏔️ **CU Boulder Flatirons** · built with the class services on `dobolyi.com`")
 
     # -- wiring ---------------------------------------------------------
     create_btn.click(

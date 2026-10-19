@@ -7,7 +7,7 @@ for agentic use and is **never** used by this app.
 
 ## Live demo
 
-🔗 **https://2a91ea2cda51b601a6.gradio.live** — the app currently running.
+🔗 **https://af087f2ebe902c8437.gradio.live** — the app currently running.
 
 > Share links rotate: this public URL dies with the app process and expires
 > automatically (~1 week). When it stops working, refresh it by launching
@@ -163,10 +163,14 @@ play/pause/skip and the cue sheet tells the listener where each segment starts.
 Costs: a WAV file per show (~5 MB/min) and no per-segment hot-swap, both
 acceptable for a class-sized library.
 
-**Visual theme (design choice):** the UI is a **Spotify-vibe dark player** in CU
-Boulder black & gold — near-black background (`#121212`), CU gold
-(`#CFB87C`) primary buttons, sliders, and links, pill-shaped buttons, Inter
-font — with the CU Boulder header/footer. One screen, three numbered sections.
+**Visual theme (design choice):** the UI is a **Flatirons Boulder theme** —
+warm paper background (`#f5f1e8`), white cards, terracotta red-rock
+(`#a6503c`) primary buttons/sliders/accents, sand borders, sky-blue links,
+and dark warm text. Chosen over an earlier black & gold Spotify-style dark
+theme because dark-on-dark styling hurt readability; the light, earthy
+palette is high-contrast and easy on the eyes while still evoking Boulder
+(Front Range rock, sand, sky). Section headings get a terracotta accent bar;
+buttons are pill-shaped; one screen, three numbered sections.
 
 **A limitation investigated:** the empty-LLM-reply failure (case B above). We
 assumed disabling thinking would bound reply length; live testing showed the
