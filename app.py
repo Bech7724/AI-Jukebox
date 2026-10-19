@@ -369,48 +369,103 @@ theme = gr.themes.Base(
     border_color_accent=_TERRA,
     link_text_color=_SKY,
     link_text_color_dark=_SKY,
+    body_text_size="15px",
+    input_text_size="15px",
+    button_large_text_size="16px",
 )
 
 _UI_CSS = """
-.gradio-container { max-width: 1150px !important; margin: 0 auto !important; }
+.gradio-container { max-width: 1180px !important; margin: 0 auto !important; }
 button { border-radius: 999px !important; }
 blockquote { border-left: 3px solid #a6503c !important; }
-h3 { color: #3a342c !important; border-left: 4px solid #a6503c; padding-left: 10px; }
 footer { color: #7a7264 !important; }
+
+/* ---- hero header ---- */
+.jk-hero { padding: 26px 4px 18px; border-bottom: 2px solid #e2dac6; margin-bottom: 18px; }
+.jk-hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.4px; color: #2e2a24; }
+.jk-hero-title .city { color: #8a8172; font-weight: 600; }
+.jk-hero-sub { color: #6e675a; font-size: 14px; margin-top: 6px; max-width: 780px; line-height: 1.55; }
+.jk-hero-chip { display: inline-block; margin-top: 10px; background: #f0e8d6; color: #7a5f2e;
+  font-size: 12.5px; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid #e2dac6; }
+
+/* ---- numbered section banners ---- */
+.jk-section { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px;
+  padding-bottom: 10px; border-bottom: 1px solid #e2dac6; }
+.jk-badge { flex: none; width: 34px; height: 34px; border-radius: 50%;
+  background: #a6503c; color: #fff; font-weight: 800; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(166, 80, 60, 0.35); }
+.jk-section-title { font-size: 20px; font-weight: 800; color: #2e2a24; letter-spacing: -0.2px; }
+.jk-section-desc { color: #7a7264; font-size: 13px; margin-top: 1px; }
+
+/* ---- group mini-captions ---- */
+.jk-group-cap { font-size: 13px; font-weight: 700; color: #a6503c; text-transform: uppercase;
+  letter-spacing: 0.6px; margin-bottom: 2px; }
+
+/* ---- hero actions ---- */
+button.primary { font-size: 15px !important; font-weight: 700 !important; }
 """
 
-with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
-    gr.Markdown(
-        "# 🏔️ **AI Jukebox** · Boulder, Colorado\n"
-        "A Flatirons-inspired jukebox — rock, sand & sky on one screen: song "
-        "generation (LLM 9001 · FLUX cover art 9006 · ACE-Step music 9007 · "
-        "Chatterbox voice 9008). Port 9000 is never used.\n"
-        + ("_3 sample tracks preloaded for instant playback._" if _seeded else "")
+
+def _hero_html() -> str:
+    chip = ""
+    if _seeded:
+        chip = "<span class='jk-hero-chip'>▶ 3 sample tracks preloaded — play instantly</span>"
+    return (
+        "<div class='jk-hero'>"
+        "<div class='jk-hero-title'>🏔️ AI Jukebox <span class='city'>· Boulder, Colorado</span></div>"
+        "<div class='jk-hero-sub'>A Flatirons-inspired jukebox — rock, sand &amp; sky on one "
+        "screen. Songs by ACE-Step (9007), covers by FLUX (9006), lyrics &amp; DJ scripts by "
+        "Qwen (9001), DJ voice by Chatterbox (9008). Port 9000 is never used.</div>"
+        + chip + "</div>"
     )
 
+
+def _section(num: str, title: str, desc: str) -> str:
+    return (
+        "<div class='jk-section'>"
+        f"<span class='jk-badge'>{num}</span>"
+        f"<div><div class='jk-section-title'>{title}</div>"
+        f"<div class='jk-section-desc'>{desc}</div></div>"
+        "</div>"
+    )
+
+with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
+    gr.HTML(_hero_html())
+
     # ---------------- 1 · Create a song ----------------
-    gr.Markdown("### 1 · Create a song — style, mood, duration, vocal or instrumental")
+    gr.HTML(_section("1", "Create a song",
+                     "Style, mood, energy, key & meter — vocal or instrumental"))
+    with gr.Row(equal_height=False):
+        with gr.Group():
+            gr.Markdown("<div class='jk-group-cap'>Identity &amp; style</div>")
+            title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
+            genre_choice = gr.Dropdown(label="Genre / style", choices=GENRES,
+                                       value="upbeat indie pop", allow_custom_value=True)
+            genre_custom = gr.Textbox(label="Custom genre…",
+                                      placeholder="e.g. dreamy synthwave ballad",
+                                      visible=False)
+            mood_multi = gr.Dropdown(label="Mood / theme (pick any)", choices=MOODS,
+                                     multiselect=True, value=["hopeful"])
+            mood_custom = gr.Textbox(label="…or your own mood",
+                                     placeholder="late-night drive through the city")
+            vocal_style = gr.Dropdown(label="Vocals style (vocal tracks)",
+                                      choices=VOCAL_STYLES, value="Auto")
+        with gr.Group():
+            gr.Markdown("<div class='jk-group-cap'>Sound &amp; meter</div>")
+            vocal_radio = gr.Radio(choices=["Vocal", "Instrumental"], value="Vocal",
+                                   label="Track type")
+            duration_slider = gr.Slider(8, 60, value=20, step=2,
+                                        label="Track length (seconds)")
+            energy_slider = gr.Slider(1, 10, value=5, step=1,
+                                      label="Energy (1 = whisper, 10 = fever)")
+            bpm_slider = gr.Slider(60, 180, value=0, step=2, label="Tempo (BPM, 0 = auto)")
+            key_choice = gr.Dropdown(label="Key", choices=KEYS, value="Auto")
+            tsig_choice = gr.Dropdown(label="Time signature", choices=TIME_SIGNATURES,
+                                      value="Auto")
     with gr.Row():
-        title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
-        genre_choice = gr.Dropdown(label="Genre / style", choices=GENRES,
-                                   value="upbeat indie pop", allow_custom_value=True)
-        mood_multi = gr.Dropdown(label="Mood / theme (pick any)", choices=MOODS,
-                                 multiselect=True, value=["hopeful"])
-        vocal_radio = gr.Radio(choices=["Vocal", "Instrumental"], value="Vocal",
-                               label="Track type")
-        vocal_style = gr.Dropdown(label="Vocals style (vocal tracks)", choices=VOCAL_STYLES,
-                                  value="Auto")
-        create_btn = gr.Button("🎬 Generate song + cover", variant="primary")
-        surprise_btn = gr.Button("🎲 Surprise me", variant="secondary")
-    with gr.Row():
-        genre_custom = gr.Textbox(label="Custom genre…", placeholder="e.g. dreamy synthwave ballad",
-                                  visible=False)
-        mood_custom = gr.Textbox(label="…or your own mood", placeholder="late-night drive through the city")
-        duration_slider = gr.Slider(8, 60, value=20, step=2, label="Track length (seconds)")
-        energy_slider = gr.Slider(1, 10, value=5, step=1, label="Energy (1 = whisper, 10 = fever)")
-        bpm_slider = gr.Slider(60, 180, value=0, step=2, label="Tempo (BPM, 0 = auto)")
-        key_choice = gr.Dropdown(label="Key", choices=KEYS, value="Auto")
-        tsig_choice = gr.Dropdown(label="Time signature", choices=TIME_SIGNATURES, value="Auto")
+        create_btn = gr.Button("🎬 Generate song + cover", variant="primary", scale=3)
+        surprise_btn = gr.Button("🎲 Surprise me", scale=1)
     with gr.Accordion("Custom lyrics (optional — vocal tracks; blank = AI-written)",
                       open=False):
         lyrics_box = gr.Textbox(lines=5, placeholder="[Verse 1]\n…", label="")
@@ -421,21 +476,22 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     create_report = gr.Markdown("")
 
     # ---------------- 2 · Playback queue with AI DJ ----------------
-    gr.Markdown(
-        "### 2 · Playback queue — DJ commentary between songs\n"
-        "Pick tracks **in queue order**, optionally upload an MP3/WAV voice "
-        "reference (blank = default DJ voice), then **Build the show**. The DJ — "
-        "Qwen-written, Chatterbox-spoken — introduces every track and the show is "
-        "mixed into **one continuous track**: play/pause/skip in the player, the "
-        "queue advances automatically, and speech never overlaps music."
-    )
-    with gr.Row():
-        show_picker = gr.Dropdown(label="Queue (pick tracks in order)", multiselect=True,
-                                  choices=_song_choices())
-        voice_ref = gr.Audio(label="DJ voice reference (optional MP3/WAV)",
-                             type="filepath")
-        build_btn = gr.Button("🎙️ Build the show", variant="primary")
-        shuffle_btn = gr.Button("🔀 Shuffle queue")
+    gr.HTML(_section(
+        "2", "Playback queue — AI DJ",
+        "Pick tracks in order, optionally clone the DJ's voice, then Build the show. "
+        "The show is mixed into one continuous track: the queue advances itself and "
+        "speech never overlaps music."
+    ))
+    with gr.Group():
+        gr.Markdown("<div class='jk-group-cap'>Setlist &amp; voice</div>")
+        with gr.Row():
+            show_picker = gr.Dropdown(label="Queue (pick tracks in order)", multiselect=True,
+                                      choices=_song_choices())
+            voice_ref = gr.Audio(label="DJ voice reference (optional MP3/WAV)",
+                                 type="filepath")
+        with gr.Row():
+            build_btn = gr.Button("🎙️ Build the show", variant="primary", scale=2)
+            shuffle_btn = gr.Button("🔀 Shuffle queue", scale=1)
     show_audio = gr.Audio(label="Queue player (continuous mix)", type="filepath",
                           autoplay=True, elem_id="show-player")
     jukebox_viz = gr.HTML(_viz_html("", []))
@@ -444,7 +500,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
         show_covers = gr.Gallery(label="Covers in this queue", columns=3, height=200)
 
     # ---------------- 3 · Library ----------------
-    gr.Markdown("### 3 · Library — titles and matching cover art")
+    gr.HTML(_section("3", "Library", "Every track's title and matching cover art"))
     library_gallery = gr.Gallery(label="All tracks", columns=3, height=220,
                                  value=_library_gallery_items())
     library_table = gr.Dataframe(headers=LIBRARY_HEADERS, type="array",

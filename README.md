@@ -196,8 +196,12 @@ warm paper background (`#f5f1e8`), white cards, terracotta red-rock
 and dark warm text. Chosen over an earlier black & gold Spotify-style dark
 theme because dark-on-dark styling hurt readability; the light, earthy
 palette is high-contrast and easy on the eyes while still evoking Boulder
-(Front Range rock, sand, sky). Section headings get a terracotta accent bar;
-buttons are pill-shaped; one screen, three numbered sections.
+(Front Range rock, sand, sky). Layout hierarchy is deliberate: a large bold
+**hero header**, numbered **section banners** (badge + big title + one-line
+description), controls grouped into titled cards ("Identity & style" /
+"Sound & meter" / "Setlist & voice"), and the primary action (**Generate**,
+**Build the show**) rendered larger than secondary buttons. Section headings
+get a terracotta accent; buttons are pill-shaped; one screen, three sections.
 
 **A limitation investigated:** the empty-LLM-reply failure (case B above). We
 assumed disabling thinking would bound reply length; live testing showed the
