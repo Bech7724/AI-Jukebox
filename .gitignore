@@ -17,3 +17,8 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# Packaging / ephemeral
+dist/
+*.zip
+share_url.txt

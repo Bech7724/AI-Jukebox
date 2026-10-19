@@ -1,5 +1,7 @@
 # 🎵 AI Jukebox
 
+[![CI](https://github.com/Bech7724/AI-Jukebox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Bech7724/AI-Jukebox/actions/workflows/ci.yml)
+
 Generate a **song**, its **cover art**, and a full **jukebox show with a spoken DJ**
 — every AI feature runs on the class model services (`dobolyi.com` ports
 9001 / 9006 / 9007 / 9008, see `class-endpoints.txt`). Port 9000 is reserved
@@ -86,13 +88,21 @@ GitHub. Keep `.env` and `data/` out of any submission archive too.
 **Launch:**
 
 ```bash
+bash run.sh                            # one command: creates .venv + .env.example,
+                                       # installs deps, starts on 127.0.0.1:7860
+# or manually:
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env                 # fill AIJ_API_KEY
-python app.py                        # http://127.0.0.1:7860 (Gradio picks the
-                                     # next free port if 7860 is busy)
+cp .env.example .env                   # fill AIJ_API_KEY
+python app.py                          # http://127.0.0.1:7860 (Gradio picks the
+                                       # next free port if 7860 is busy)
 # optional public link: AIJ_SHARE=1 python app.py
 ```
+
+**Submission archive:** `python scripts/make_zip.py` builds
+`dist/ai-jukebox-submission.zip` (7.4 MB, deploy-from-ZIP ready) and
+`python scripts/make_zip.py --check` verifies it — asserting no `.env`,
+`data/`, or `samples/_stage/` content ever ships. `dist/` is gitignored.
 
 **Exercising the three core features:**
 
@@ -190,7 +200,8 @@ failing hard on a model quirk.
 ## Layout
 
 ```
-app.py                 Gradio UI (Create / Jukebox / Library)
+run.sh / run.bat       one-command launcher (venv + deps + start)
+app.py                 Gradio UI (single screen: Create / Queue / Library)
 ai_jukebox/
   config.py            env-driven config (host, ports, models, key)
   http.py              auth'd HTTP helpers (stdlib only)
