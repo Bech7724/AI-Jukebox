@@ -1,14 +1,18 @@
-"""AI Jukebox — Gradio UI.
+"""AI Jukebox — Gradio UI (single screen).
 
-Tabs:
-  1. Create — describe a song (vocal or instrumental); the app writes lyrics
-     (9001), produces the track (9007), and designs cover art (9006).
-  2. Jukebox — pick tracks, optionally upload an MP3/WAV voice reference,
-     build a show of spoken DJ commentary (9001 + 9008) between songs, and
-     play it as ONE continuous mix (play/pause/skip controls; the queue
-     advances automatically; speech never overlaps music), with a cue sheet
-     and per-track covers.
-  3. Library — browse, refresh, and delete generated tracks.
+One page, three sections:
+  1. Create a song — style, mood, duration, vocal|instrumental; the app
+     writes lyrics (9001), produces the track (9007), and paints cover art
+     (9006). Progress is reported step by step; failures show a clear error
+     and the Generate button is always ready to retry.
+  2. Playback queue — pick tracks (in queue order), optionally upload an
+     MP3/WAV voice reference to clone the DJ's voice (blank = default);
+     Build the show mixes Qwen-written, Chatterbox-spoken DJ commentary
+     (9001 + 9008) between songs into ONE continuous track. The player has
+     play/pause/skip controls; the queue advances automatically and speech
+     never overlaps music. A cue sheet lists every segment with its start
+     time and the covers of the queued tracks.
+  3. Library — titles + matching covers, metadata, delete/refresh.
 
 Three pre-generated sample tracks ship under samples/ (AI-written lyrics
 only) and are seeded into the library on first run.
@@ -96,7 +100,7 @@ _STEP_FRACTIONS = {
 }
 
 
-# ---------------------------------------------------------------- Create tab
+# ------------------------------------------------------------ section 1: create
 
 def create_song(title, genre, mood, vocal_choice, custom_lyrics, duration, thinking,
                 progress=gr.Progress()):
@@ -118,7 +122,7 @@ def create_song(title, genre, mood, vocal_choice, custom_lyrics, duration, think
             vocal=vocal,
             progress_cb=_cb,
         )
-    except Exception as e:  # surfaced in the UI, never the terminal
+    except Exception as e:  # surfaced in the UI, never the terminal; retry is one click
         progress(0.0, desc="Failed")
         raise gr.Error(
             f"Generation failed — nothing was saved. Check the class services "
@@ -137,11 +141,11 @@ def create_song(title, genre, mood, vocal_choice, custom_lyrics, duration, think
     for s in steps:
         mark = "✅" if s.status == "ok" else "⚠️"
         lines.append(f"- `{s.name}` {mark} {s.detail or s.error} ({s.seconds:.1f}s)")
-    lines.append("\n_Track added to the library — pick it in the Jukebox tab._")
+    lines.append("\n_Track added to the library — queue it in section 2._")
     return song.audio_path, song.cover_path, "\n".join(lines), _dropdown_update(), _gallery_update()
 
 
-# --------------------------------------------------------------- Jukebox tab
+# -------------------------------------------------------- section 2: queue + DJ
 
 def _format_ts(seconds: float) -> str:
     return f"{int(seconds // 60)}:{int(seconds % 60):02d}"
@@ -185,7 +189,7 @@ def build_show(selected_ids, voice_ref):
     )
 
 
-# -------------------------------------------------------------- Library tab
+# ----------------------------------------------------------- section 3: library
 
 def delete_song(song_id):
     if song_id:
@@ -199,70 +203,110 @@ def refresh_library():
 
 # ---------------------------------------------------------------------- UI
 
-with gr.Blocks(title="AI Jukebox", theme=gr.themes.Soft()) as demo:
+# Spotify-vibe dark theme with CU Boulder black & gold.
+_GOLD = "#cfb87c"          # CU gold
+_SPOTIFY_DARK = "#121212"  # near-black, like a dark-mode player
+_CARD = "#1a1a1a"
+
+theme = gr.themes.Base(
+    primary_hue=gr.themes.colors.amber,
+    neutral_hue=gr.themes.colors.gray,
+    font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "sans-serif"],
+).set(
+    body_background_fill=_SPOTIFY_DARK,
+    body_background_fill_dark=_SPOTIFY_DARK,
+    block_background_fill=_CARD,
+    block_background_fill_dark=_CARD,
+    block_border_color="#2b2b2b",
+    block_label_text_color="#e8e6e1",
+    block_title_text_color="#f5f3ec",
+    body_text_color="#d9d7d1",
+    input_background_fill="#1f1f1f",
+    input_border_color="#3a3a3a",
+    button_primary_background_fill=_GOLD,
+    button_primary_background_fill_hover=_GOLD,
+    button_primary_text_color="#111111",
+    button_primary_border_color=_GOLD,
+    button_secondary_background_fill="#222222",
+    button_secondary_text_color="#e8e6e1",
+    slider_color=_GOLD,
+    slider_color_dark=_GOLD,
+    border_color_primary="#2b2b2b",
+    border_color_accent=_GOLD,
+    link_text_color=_GOLD,
+    link_text_color_dark=_GOLD,
+)
+
+_UI_CSS = """
+.gradio-container { max-width: 1150px !important; margin: 0 auto !important; }
+button { border-radius: 999px !important; }
+blockquote { border-left: 3px solid #cfb87c !important; }
+"""
+
+with gr.Blocks(title="AI Jukebox · CU Boulder", theme=theme, css=_UI_CSS) as demo:
     gr.Markdown(
-        "# 🎵 AI Jukebox\n"
-        "Generate a song, its cover art, and a spoken DJ set — all on the class "
-        "services (LLM 9001 · FLUX cover art 9006 · ACE-Step music 9007 · Chatterbox "
-        "voice 9008). Port 9000 is never used.\n"
+        "# 🎵 **AI Jukebox** · University of Colorado Boulder\n"
+        "A Spotify-vibe jukebox in black & gold — one screen: song generation "
+        "(LLM 9001 · FLUX cover art 9006 · ACE-Step music 9007 · Chatterbox voice "
+        "9008). Port 9000 is never used.\n"
         + ("_3 sample tracks preloaded for instant playback._" if _seeded else "")
     )
 
-    with gr.Tabs():
-        # ---------------- Create ----------------
-        with gr.Tab("Create a song"):
-            with gr.Row():
-                with gr.Column(scale=1):
-                    title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
-                    genre_box = gr.Textbox(label="Genre / style", value="upbeat indie pop",
-                                           placeholder="e.g. dreamy synthwave ballad")
-                    mood_box = gr.Textbox(label="Mood / theme", value="hopeful and sunny",
-                                          placeholder="e.g. late-night drive through the city")
-                    vocal_radio = gr.Radio(choices=["Vocal", "Instrumental"], value="Vocal",
-                                           label="Track type")
-                    lyrics_box = gr.Textbox(
-                        label="Custom lyrics (optional, vocal tracks — blank = AI-written)",
-                        lines=6, placeholder="[Verse 1]\n…")
-                    with gr.Row():
-                        duration_slider = gr.Slider(8, 60, value=20, step=2,
-                                                    label="Track length (seconds)")
-                        thinking_box = gr.Checkbox(label="LM planning (slower, richer)",
-                                                   value=False)
-                    create_btn = gr.Button("🎬 Generate song + cover", variant="primary")
-                with gr.Column(scale=1):
-                    song_audio = gr.Audio(label="Your song", type="filepath")
-                    cover_img = gr.Image(label="Cover art", type="filepath", height=300)
-            create_report = gr.Markdown("")
+    # ---------------- 1 · Create a song ----------------
+    gr.Markdown("### 1 · Create a song — style, mood, duration, vocal or instrumental")
+    with gr.Row():
+        title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
+        genre_box = gr.Textbox(label="Genre / style", value="upbeat indie pop",
+                               placeholder="e.g. dreamy synthwave ballad")
+        mood_box = gr.Textbox(label="Mood / theme", value="hopeful and sunny",
+                              placeholder="e.g. late-night drive through the city")
+        vocal_radio = gr.Radio(choices=["Vocal", "Instrumental"], value="Vocal",
+                               label="Track type")
+        duration_slider = gr.Slider(8, 60, value=20, step=2,
+                                    label="Track length (seconds)")
+        create_btn = gr.Button("🎬 Generate song + cover", variant="primary")
+    with gr.Accordion("Custom lyrics (optional — vocal tracks; blank = AI-written)",
+                      open=False):
+        lyrics_box = gr.Textbox(lines=5, placeholder="[Verse 1]\n…", label="")
+        thinking_box = gr.Checkbox(label="LM planning (slower, richer)", value=False)
+    with gr.Row():
+        song_audio = gr.Audio(label="Your song", type="filepath")
+        cover_img = gr.Image(label="Cover art", type="filepath", height=300)
+    create_report = gr.Markdown("")
 
-        # ---------------- Jukebox ----------------
-        with gr.Tab("Jukebox show"):
-            gr.Markdown(
-                "Pick tracks (in play order) and **Build the show**. The DJ — Qwen-written, "
-                "spoken by Chatterbox — introduces every track; the show is mixed into **one "
-                "continuous track** with play/pause/skip controls: the queue advances "
-                "automatically and speech never overlaps music. Upload an **MP3/WAV voice "
-                "reference** to clone the DJ's voice, or leave it empty for the default voice."
-            )
-            with gr.Row():
-                show_picker = gr.Dropdown(label="Tracks for the show (in order)", multiselect=True,
-                                          choices=_song_choices())
-                voice_ref = gr.Audio(label="DJ voice reference (optional MP3/WAV)",
-                                     type="filepath")
-                build_btn = gr.Button("🎙️ Build the show", variant="primary")
-            show_audio = gr.Audio(label="Show (continuous mix)", type="filepath", autoplay=True)
-            show_cue = gr.Markdown("")
-            show_covers = gr.Gallery(label="Tracks in this show", columns=3, height=200)
+    # ---------------- 2 · Playback queue with AI DJ ----------------
+    gr.Markdown(
+        "### 2 · Playback queue — DJ commentary between songs\n"
+        "Pick tracks **in queue order**, optionally upload an MP3/WAV voice "
+        "reference (blank = default DJ voice), then **Build the show**. The DJ — "
+        "Qwen-written, Chatterbox-spoken — introduces every track and the show is "
+        "mixed into **one continuous track**: play/pause/skip in the player, the "
+        "queue advances automatically, and speech never overlaps music."
+    )
+    with gr.Row():
+        show_picker = gr.Dropdown(label="Queue (pick tracks in order)", multiselect=True,
+                                  choices=_song_choices())
+        voice_ref = gr.Audio(label="DJ voice reference (optional MP3/WAV)",
+                             type="filepath")
+        build_btn = gr.Button("🎙️ Build the show", variant="primary")
+    show_audio = gr.Audio(label="Queue player (continuous mix)", type="filepath",
+                          autoplay=True)
+    with gr.Row():
+        show_cue = gr.Markdown("Pick tracks above, then **Build the show**.")
+        show_covers = gr.Gallery(label="Covers in this queue", columns=3, height=200)
 
-        # ---------------- Library ----------------
-        with gr.Tab("Library"):
-            library_gallery = gr.Gallery(label="All tracks", columns=3, height=220,
-                                         value=_library_gallery_items())
-            library_table = gr.Dataframe(headers=LIBRARY_HEADERS, type="array",
-                                         value=_library_rows())
-            with gr.Row():
-                delete_picker = gr.Dropdown(label="Delete a track", choices=_song_choices())
-                delete_btn = gr.Button("🗑️ Delete", variant="stop")
-                refresh_btn = gr.Button("↻ Refresh")
+    # ---------------- 3 · Library ----------------
+    gr.Markdown("### 3 · Library — titles and matching cover art")
+    library_gallery = gr.Gallery(label="All tracks", columns=3, height=220,
+                                 value=_library_gallery_items())
+    library_table = gr.Dataframe(headers=LIBRARY_HEADERS, type="array",
+                                 value=_library_rows())
+    with gr.Row():
+        delete_picker = gr.Dropdown(label="Delete a track", choices=_song_choices())
+        delete_btn = gr.Button("🗑️ Delete", variant="stop")
+        refresh_btn = gr.Button("↻ Refresh")
+
+    gr.Markdown("---\n🎓 **CU Boulder** · built with the class services on `dobolyi.com`")
 
     # -- wiring ---------------------------------------------------------
     create_btn.click(
