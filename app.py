@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import base64
 import os
+import random
 import time
 from pathlib import Path
 
@@ -188,7 +189,8 @@ def build_show(selected_ids, voice_ref):
     songs = [s for s in library.all() if s.id in (selected_ids or [])]
     if not songs:
         return (None, gr.Gallery(value=[], columns=3, height=200),
-                "⚠️ Pick at least one track, then press **Build the show**.")
+                "⚠️ Pick at least one track, then press **Build the show**.",
+                _viz_html("", []))
     # Preserve the order in which the user selected tracks (the queue order).
     order = {s.id: i for i, s in enumerate(songs)}
     songs.sort(key=lambda s: order[s.id])
@@ -215,10 +217,16 @@ def build_show(selected_ids, voice_ref):
         (s.cover_path, f"{s.title} — {s.genre} ({_track_type(s)})")
         for s in songs if s.cover_path
     ]
+    viz = _viz_html(
+        mixed,
+        [(t, "DJ" if seg["kind"] == "intro" else seg["label"].split(" · ")[0])
+         for seg, t in zip(segments, starts)],
+    )
     return (
         mixed,
         gr.Gallery(value=gallery_items, columns=max(1, len(gallery_items)), height=200),
         "\n".join(lines),
+        viz,
     )
 
 
@@ -232,6 +240,90 @@ def delete_song(song_id):
 
 def refresh_library():
     return _df_update(), _dropdown_update(), _gallery_update()
+
+
+# ----------------------------------------------------------- fun + polish
+
+SURPRISE_TITLES = [
+    "Midnight Mirage", "Canyon Echo", "Golden Hour Drive", "Starlit Campfire",
+    "Pine & Rain", "High Country Haze", "Flatiron Funk", "Buffalo Moon",
+    "Alpine Glow", "Skyline Serenade",
+]
+
+
+def surprise_me():
+    """One click: random title + full styling so the DJ booth rolls its own."""
+    moods = random.sample(MOODS, k=random.randint(1, 3))
+    return (
+        gr.update(value=random.choice(SURPRISE_TITLES)),
+        gr.update(value=random.choice([g for g in GENRES if g != "Custom…"])),
+        gr.update(value=moods),
+        gr.update(value=random.randint(1, 10)),
+        gr.update(value=random.choice([0, 80, 92, 104, 116, 128, 140, 152])),
+        gr.update(value=random.choice(KEYS)),
+        gr.update(value=random.choice(TIME_SIGNATURES)),
+        gr.update(value=random.choice(VOCAL_STYLES)),
+        gr.update(value=""),
+        gr.update(value="", visible=False),
+    )
+
+
+def shuffle_queue(selected):
+    """Randomize the queue order (the DJ loves a mystery set)."""
+    q = list(selected or [])
+    random.shuffle(q)
+    return gr.update(choices=_song_choices(), value=q or None)
+
+
+def rename_song(song_id, new_title):
+    if song_id and new_title and new_title.strip():
+        library.rename(song_id, new_title.strip())
+    return (_df_update(), _dropdown_update(), _dropdown_update(),
+            _dropdown_update(), _gallery_update(), gr.update(value=""))
+
+
+# Client-side skip buttons: seek the continuous-mix player to the previous /
+# next cue time. The cue list rides in data-cues on the panel div, so the JS
+# needs no backend round-trip. (Native player seek still works as always.)
+_SKIP_JS = ("var a=document.querySelector('#show-player audio');"
+            "var box=document.getElementById('jukebox-controls');"
+            "if(!a||!box)return;"
+            "var cs=(box.getAttribute('data-cues')||'').split(',').map(parseFloat)"
+            ".filter(function(x){return isFinite(x)});"
+            "var t=a.currentTime||0,n=-1,i;"
+            "if(d>0){for(i=0;i<cs.length;i++){if(cs[i]>t+0.6){n=i;break}}}"
+            "else{for(i=cs.length-1;i>=0;i--){if(cs[i]<t-1.0){n=i;break}}}"
+            "if(n>=0){a.currentTime=cs[n];if(a.paused)a.play()}")
+
+_BTN_TPL = (
+    '<button onclick="(function(d){__SKIP__})(%d)" '
+    'style="border-radius:999px;border:1px solid #e2dac6;background:#ffffff;'
+    'color:#2e2a24;padding:7px 18px;cursor:pointer;font-size:14px;'
+    'font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)">%s</button>'
+)
+
+
+def _viz_html(mix_path, markers):
+    """Waveform of the mixed show + ⏮/⏭ skip buttons, as one HTML block."""
+    if not mix_path or not markers:
+        return (
+            "<div id='jukebox-controls' data-cues=''>"
+            "<div style='color:#8a8172;font-size:13px;padding:8px 2px'>"
+            "🎼 Build a show to see its mix waveform — the ⏮ Prev / ⏭ Next "
+            "buttons skip between tracks (or drag the player's seek bar)."
+            "</div></div>"
+        )
+    cues = ",".join(f"{t:.2f}" for t, _ in markers)
+    svg = media.waveform_svg(mix_path, markers=markers)
+    prev = _BTN_TPL.replace("__SKIP__", _SKIP_JS) % (-1, "⏮ Prev")
+    nxt = _BTN_TPL.replace("__SKIP__", _SKIP_JS) % (1, "⏭ Next")
+    return (
+        f"<div id='jukebox-controls' data-cues='{cues}'>"
+        f"<div style='display:flex;align-items:center;gap:16px'>"
+        f"<div style='flex:1;min-width:300px'>{svg}</div>"
+        f"<div style='display:flex;flex-direction:column;gap:8px'>{prev}{nxt}</div>"
+        f"</div></div>"
+    )
 
 
 # ---------------------------------------------------------------------- UI
@@ -309,6 +401,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
         vocal_style = gr.Dropdown(label="Vocals style (vocal tracks)", choices=VOCAL_STYLES,
                                   value="Auto")
         create_btn = gr.Button("🎬 Generate song + cover", variant="primary")
+        surprise_btn = gr.Button("🎲 Surprise me", variant="secondary")
     with gr.Row():
         genre_custom = gr.Textbox(label="Custom genre…", placeholder="e.g. dreamy synthwave ballad",
                                   visible=False)
@@ -342,8 +435,10 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
         voice_ref = gr.Audio(label="DJ voice reference (optional MP3/WAV)",
                              type="filepath")
         build_btn = gr.Button("🎙️ Build the show", variant="primary")
+        shuffle_btn = gr.Button("🔀 Shuffle queue")
     show_audio = gr.Audio(label="Queue player (continuous mix)", type="filepath",
-                          autoplay=True)
+                          autoplay=True, elem_id="show-player")
+    jukebox_viz = gr.HTML(_viz_html("", []))
     with gr.Row():
         show_cue = gr.Markdown("Pick tracks above, then **Build the show**.")
         show_covers = gr.Gallery(label="Covers in this queue", columns=3, height=200)
@@ -355,6 +450,9 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     library_table = gr.Dataframe(headers=LIBRARY_HEADERS, type="array",
                                  value=_library_rows())
     with gr.Row():
+        rename_picker = gr.Dropdown(label="Rename a track", choices=_song_choices())
+        rename_box = gr.Textbox(label="New title", placeholder="What should we call it?")
+        rename_btn = gr.Button("✏️ Rename")
         delete_picker = gr.Dropdown(label="Delete a track", choices=_song_choices())
         delete_btn = gr.Button("🗑️ Delete", variant="stop")
         refresh_btn = gr.Button("↻ Refresh")
@@ -383,7 +481,19 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     build_btn.click(
         build_show,
         inputs=[show_picker, voice_ref],
-        outputs=[show_audio, show_covers, show_cue],
+        outputs=[show_audio, show_covers, show_cue, jukebox_viz],
+    )
+
+    surprise_btn.click(
+        surprise_me, inputs=[],
+        outputs=[title_box, genre_choice, mood_multi, energy_slider, bpm_slider,
+                 key_choice, tsig_choice, vocal_style, mood_custom, genre_custom],
+    )
+    shuffle_btn.click(shuffle_queue, inputs=[show_picker], outputs=[show_picker])
+    rename_btn.click(
+        rename_song, inputs=[rename_picker, rename_box],
+        outputs=[library_table, delete_picker, rename_picker, show_picker,
+                 library_gallery, rename_box],
     )
 
     delete_btn.click(delete_song, inputs=[delete_picker],

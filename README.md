@@ -40,6 +40,12 @@ Three pre-generated sample tracks (titles + covers, AI-written lyrics only)
 ship under `samples/` and are loaded into the library on first run so the app
 is playable the moment it starts.
 
+**Extras (unique touches):** 🎲 **Surprise me** rolls a random title + full
+styling in one click (instant demo jam), 🔀 **Shuffle queue** randomizes the
+set order, ✏️ **Rename** retitles any track, and the queue player gets a
+**waveform of the mixed show** with cue markers plus **⏮ Prev / ⏭ Next**
+buttons that jump between tracks in the continuous mix.
+
 ## Screenshots
 
 | Create a song | Jukebox show | Library |
@@ -119,7 +125,7 @@ python app.py                          # http://127.0.0.1:7860 (Gradio picks the
 
 ## Test results
 
-**Unit tests** (no network — every class service mocked): 48 passing,
+**Unit tests** (no network — every class service mocked): 52 passing,
 `python -m pytest -q`, run in CI on push.
 
 **Live end-to-end evidence** (run 2026-10-19 against the real class endpoints;
@@ -162,6 +168,10 @@ cover prompt 2048, DJ script 1024). Regression tests cover both paths.
   flows (exercised via library calls and screenshots, not scripted UI clicks);
   sung-lyrics pronunciation quality (ACE-Step controls vocals; no per-phrase
   control); long-running soak of the share URL; CI results after this push.
+
+> **Team verification:** the step-by-step grader dress-rehearsal lives in
+> [scripts/verification_checklist.md](scripts/verification_checklist.md).
+> Run it on a fresh ZIP deploy and move these bullets to ✅.
 
 ## Design judgment
 
@@ -216,7 +226,9 @@ ai_jukebox/
 scripts/
   generate_samples.py  regenerates the 3 bundled samples (class endpoints)
   e2e_evidence.py      live end-to-end evidence run (writes evidence_output.json)
-tests/                 unit tests with mocked services (48)
+  make_zip.py          builds the submission ZIP (+ --check safeguard audit)
+  verification_checklist.md  team's grader-dress-rehearsal checklist
+tests/                 unit tests with mocked services (52)
 docs/screenshots/      UI screenshots used in this report
 samples/               bundled pre-generated sample tracks (committed)
 ```

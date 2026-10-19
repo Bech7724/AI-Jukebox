@@ -116,6 +116,24 @@ class Library:
         (self.root / "dj" / f"{song_id}.intro.mp3").unlink(missing_ok=True)
         return True
 
+    def rename(self, song_id: str, new_title: str) -> bool:
+        """Retitle a track in the index (files keep their stable id)."""
+        new_title = (new_title or "").strip()
+        if not new_title:
+            return False
+        with self._lock:
+            items = self._load()
+            for it in items:
+                if it["id"] == song_id:
+                    old = it.get("title")
+                    it["title"] = new_title
+                    it.setdefault("meta", {})
+                    if old:
+                        it["meta"]["renamed_from"] = old
+                    self._save(items)
+                    return True
+        return False
+
     # -- asset paths ----------------------------------------------------
     def song_dir(self, song_id: str) -> Path:
         return self.root / "songs" / song_id

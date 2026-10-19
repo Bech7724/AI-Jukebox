@@ -54,3 +54,31 @@ def test_mix_show_decodes_mp3_and_wav_together(tmp_path):
         assert w.getnchannels() == CHANNELS
         assert w.getframerate() == RATE
     assert Path(out).stat().st_size > 0
+
+
+def test_waveform_svg_emits_mirrored_wave_and_markers(tmp_path):
+    import struct, math
+    path = str(tmp_path / "wave.wav")
+    frames = b"".join(
+        struct.pack("<hh", int(12000 * math.sin(2 * math.pi * 440 * i / RATE)),
+                    int(12000 * math.sin(2 * math.pi * 440 * i / RATE)))
+        for i in range(int(RATE * 0.1))
+    )
+    with wave.open(path, "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(frames)
+    svg = media.waveform_svg(path, width=320, height=100,
+                             markers=[(0.0, "DJ"), (0.1, "Neon")])
+    assert svg.startswith("<svg")
+    # mirrored peaks -> two polylines
+    assert svg.count("<polyline") == 2
+    # cue markers with labels
+    assert svg.count("<line") == 2
+    assert "Neon" in svg and "DJ" in svg
+    assert "#a6503c" in svg  # terra accent
+
+
+def test_waveform_svg_handles_garbage_path():
+    assert media.waveform_svg("/nonexistent/definitely-not-here.mp3") in ("", "<svg></svg>")

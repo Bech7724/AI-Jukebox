@@ -43,6 +43,25 @@ def test_delete_removes_index_and_assets(isolated_data_dir):
     assert lib.delete("abc123") is False
 
 
+def test_rename_retitles_and_persists(isolated_data_dir):
+    lib = Library(str(isolated_data_dir))
+    lib.add(_song())
+    assert lib.rename("abc123", "  Golden Rename  ") is True
+    song = lib.get("abc123")
+    assert song.title == "Golden Rename"
+    assert song.meta["renamed_from"] == "Tune"
+    # survives a reload from disk
+    assert Library(str(isolated_data_dir)).get("abc123").title == "Golden Rename"
+
+
+def test_rename_rejects_blank_or_unknown(isolated_data_dir):
+    lib = Library(str(isolated_data_dir))
+    lib.add(_song())
+    assert lib.rename("abc123", "   ") is False
+    assert lib.rename("nope", "X") is False
+    assert lib.get("abc123").title == "Tune"
+
+
 def test_from_dict_ignores_unknown_keys(isolated_data_dir):
     lib = Library(str(isolated_data_dir))
     d = _song().to_dict()
