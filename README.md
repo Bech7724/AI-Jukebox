@@ -9,7 +9,7 @@ for agentic use and is **never** used by this app.
 
 ## Live demo
 
-🔗 **https://4ea591bcc1eece89b4.gradio.live** — the app currently running.
+🔗 **https://d83a8dbdbf85c07227.gradio.live** — the app currently running.
 
 > Share links rotate: this public URL dies with the app process and expires
 > automatically (~1 week). When it stops working, refresh it by launching
@@ -125,7 +125,7 @@ python app.py                          # http://127.0.0.1:7860 (Gradio picks the
 
 ## Test results
 
-**Unit tests** (no network — every class service mocked): 52 passing,
+**Unit tests** (no network — every class service mocked): 53 passing,
 `python -m pytest -q`, run in CI on push.
 
 **Live end-to-end evidence** (run 2026-10-19 against the real class endpoints;
@@ -232,7 +232,7 @@ scripts/
   e2e_evidence.py      live end-to-end evidence run (writes evidence_output.json)
   make_zip.py          builds the submission ZIP (+ --check safeguard audit)
   verification_checklist.md  team's grader-dress-rehearsal checklist
-tests/                 unit tests with mocked services (52)
+tests/                 unit tests with mocked services (53)
 docs/screenshots/      UI screenshots used in this report
 samples/               bundled pre-generated sample tracks (committed)
 ```

@@ -84,6 +84,11 @@ def _dropdown_update() -> gr.Dropdown:
     return gr.Dropdown(choices=_song_choices(), value=None)
 
 
+def _picker_update(value=None) -> gr.Dropdown:
+    """Dropdown refresh that preserves a selectable value (queue order)."""
+    return gr.Dropdown(choices=_song_choices(), value=value or None)
+
+
 def _gallery_update(columns=3) -> gr.Gallery:
     return gr.Gallery(value=_library_gallery_items(), columns=columns, height=220)
 
@@ -128,7 +133,7 @@ TIME_SIGNATURES = ["Auto", "3/4", "4/4", "6/8"]
 
 def create_song(title, genre_choice, genre_custom, mood_multi, mood_custom,
                 vocal_choice, vocal_style, energy, bpm, key_choice, tsig_choice,
-                custom_lyrics, duration, thinking, progress=gr.Progress()):
+                custom_lyrics, duration, thinking, queue, progress=gr.Progress()):
     title = (title or "").strip() or "Untitled Song"
     genre = genre_choice if genre_choice and genre_choice != "Custom…" else (
         (genre_custom or "").strip() or "upbeat indie pop")
@@ -176,7 +181,9 @@ def create_song(title, genre_choice, genre_custom, mood_multi, mood_custom,
         mark = "✅" if s.status == "ok" else "⚠️"
         lines.append(f"- `{s.name}` {mark} {s.detail or s.error} ({s.seconds:.1f}s)")
     lines.append("\n_Track added to the library — queue it in section 2._")
-    return song.audio_path, song.cover_path, "\n".join(lines), _dropdown_update(), _gallery_update()
+    return (song.audio_path, song.cover_path, "\n".join(lines),
+            _picker_update(value=library.prune_ids(queue)),
+            _gallery_update(), _dropdown_update(), _dropdown_update())
 
 
 # -------------------------------------------------------- section 2: queue + DJ
@@ -232,14 +239,18 @@ def build_show(selected_ids, voice_ref):
 
 # ----------------------------------------------------------- section 3: library
 
-def delete_song(song_id):
+def delete_song(song_id, queue):
     if song_id:
         library.delete(song_id)
-    return _df_update(), _dropdown_update(), _gallery_update()
+    kept = library.prune_ids(queue)
+    return (_df_update(), _picker_update(value=kept), _dropdown_update(),
+            _dropdown_update(), _gallery_update())
 
 
-def refresh_library():
-    return _df_update(), _dropdown_update(), _gallery_update()
+def refresh_library(queue):
+    kept = library.prune_ids(queue)
+    return (_df_update(), _picker_update(value=kept), _dropdown_update(),
+            _dropdown_update(), _gallery_update())
 
 
 # ----------------------------------------------------------- fun + polish
@@ -275,10 +286,11 @@ def shuffle_queue(selected):
     return gr.update(choices=_song_choices(), value=q or None)
 
 
-def rename_song(song_id, new_title):
+def rename_song(song_id, new_title, queue):
     if song_id and new_title and new_title.strip():
         library.rename(song_id, new_title.strip())
-    return (_df_update(), _dropdown_update(), _dropdown_update(),
+    kept = library.prune_ids(queue)
+    return (_df_update(), _picker_update(value=kept), _dropdown_update(),
             _dropdown_update(), _gallery_update(), gr.update(value=""))
 
 
@@ -459,7 +471,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
                                         label="Track length (seconds)")
             energy_slider = gr.Slider(1, 10, value=5, step=1,
                                       label="Energy (1 = whisper, 10 = fever)")
-            bpm_slider = gr.Slider(60, 180, value=0, step=2, label="Tempo (BPM, 0 = auto)")
+            bpm_slider = gr.Slider(0, 220, value=0, step=2, label="Tempo (BPM, 0 = auto)")
             key_choice = gr.Dropdown(label="Key", choices=KEYS, value="Auto")
             tsig_choice = gr.Dropdown(label="Time signature", choices=TIME_SIGNATURES,
                                       value="Auto")
@@ -530,8 +542,9 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
         create_song,
         inputs=[title_box, genre_choice, genre_custom, mood_multi, mood_custom,
                 vocal_radio, vocal_style, energy_slider, bpm_slider, key_choice,
-                tsig_choice, lyrics_box, duration_slider, thinking_box],
-        outputs=[song_audio, cover_img, create_report, show_picker, library_gallery],
+                tsig_choice, lyrics_box, duration_slider, thinking_box, show_picker],
+        outputs=[song_audio, cover_img, create_report, show_picker,
+                 library_gallery, delete_picker, rename_picker],
     )
 
     build_btn.click(
@@ -547,15 +560,17 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     )
     shuffle_btn.click(shuffle_queue, inputs=[show_picker], outputs=[show_picker])
     rename_btn.click(
-        rename_song, inputs=[rename_picker, rename_box],
-        outputs=[library_table, delete_picker, rename_picker, show_picker,
+        rename_song, inputs=[rename_picker, rename_box, show_picker],
+        outputs=[library_table, show_picker, delete_picker, rename_picker,
                  library_gallery, rename_box],
     )
 
-    delete_btn.click(delete_song, inputs=[delete_picker],
-                     outputs=[library_table, delete_picker, library_gallery])
-    refresh_btn.click(refresh_library, inputs=[],
-                      outputs=[library_table, delete_picker, library_gallery])
+    delete_btn.click(delete_song, inputs=[delete_picker, show_picker],
+                     outputs=[library_table, show_picker, delete_picker,
+                              rename_picker, library_gallery])
+    refresh_btn.click(refresh_library, inputs=[show_picker],
+                      outputs=[library_table, show_picker, delete_picker,
+                               rename_picker, library_gallery])
 
 
 if __name__ == "__main__":

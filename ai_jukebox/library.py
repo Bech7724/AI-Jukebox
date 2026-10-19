@@ -134,6 +134,18 @@ class Library:
                     return True
         return False
 
+    def prune_ids(self, ids: list[str] | None) -> list[str] | None:
+        """Keep only ids that exist in the library, preserving order.
+
+        Used by the queue picker so a selection survives refresh/delete/rename
+        without dangling references to tracks that no longer exist.
+        """
+        if not ids:
+            return None
+        valid = {s.id for s in self.all()}
+        kept = [i for i in ids if i in valid]
+        return kept or None
+
     # -- asset paths ----------------------------------------------------
     def song_dir(self, song_id: str) -> Path:
         return self.root / "songs" / song_id

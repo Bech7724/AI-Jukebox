@@ -62,6 +62,20 @@ def test_rename_rejects_blank_or_unknown(isolated_data_dir):
     assert lib.get("abc123").title == "Tune"
 
 
+def test_prune_ids_keeps_order_and_drops_gone(isolated_data_dir):
+    lib = Library(str(isolated_data_dir))
+    lib.add(_song("a1", "First"))
+    lib.add(_song("b2", "Second"))
+    lib.add(_song("c3", "Third"))
+    # order preserved; unknown + deleted ids dropped
+    assert lib.prune_ids(["c3", "ghost", "a1"]) == ["c3", "a1"]
+    lib.delete("b2")
+    assert lib.prune_ids(["b2", "a1"]) == ["a1"]
+    assert lib.prune_ids([]) is None
+    assert lib.prune_ids(None) is None
+    assert lib.prune_ids(["ghost"]) is None
+
+
 def test_from_dict_ignores_unknown_keys(isolated_data_dir):
     lib = Library(str(isolated_data_dir))
     d = _song().to_dict()
