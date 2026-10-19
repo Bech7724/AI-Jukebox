@@ -404,11 +404,8 @@ footer { color: #7a7264 !important; }
 .jk-hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 3px;
   background: linear-gradient(90deg, transparent, #a6503c 20%, #e7c06a 50%, #a6503c 80%, transparent); }
 .jk-hero-title { font-size: 33px; font-weight: 800; letter-spacing: -0.6px;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  background: linear-gradient(90deg, #7a4528 8%, #a6503c 32%, #c2573d 58%, #d9a441 92%);
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
-.jk-hero-title .city { color: #8a8172; font-weight: 600; background: none;
-  -webkit-text-fill-color: #8a8172; }
+  font-family: 'Space Grotesk', 'Inter', sans-serif; color: #a6503c; }
+.jk-hero-title .city { color: #b8860b; font-weight: 700; }
 .jk-hero-sub { color: #6e675a; font-size: 14px; margin-top: 8px; max-width: 780px; line-height: 1.6; }
 .jk-hero-chip { display: inline-block; margin-top: 12px; background: linear-gradient(135deg, #f3e3b8, #ecd49a);
   color: #6b4e13; font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 999px;
