@@ -17,8 +17,8 @@ def _install_fakes(monkeypatch, cover_ok=True, music_ok=True):
 
     captured = {}
 
-    def fake_lyrics(title, genre, mood, structure="ABABCB"):
-        captured["lyrics"] = (title, genre, mood)
+    def fake_lyrics(title, genre, mood, structure="ABABCB", vocal_style=""):
+        captured["lyrics"] = (title, genre, mood, vocal_style)
         return "[Verse 1]\nHello world\n[Chorus]\nShine on"
 
     def fake_cover_prompt(title, genre, mood, lyrics):
@@ -27,8 +27,10 @@ def _install_fakes(monkeypatch, cover_ok=True, music_ok=True):
 
     def fake_music(prompt, lyrics="", duration=30, audio_format="mp3",
                    thinking=False, model=None, vocal_language="en",
-                   poll_every=5.0, timeout=420):
-        captured["music"] = (prompt, lyrics, duration, thinking)
+                   poll_every=5.0, timeout=420, bpm=None, key_scale=None,
+                   time_signature=None):
+        captured["music"] = (prompt, lyrics, duration, thinking, bpm, key_scale,
+                             time_signature)
         if not music_ok:
             raise http.ServiceError("ACE-Step boom")
         return {"audio": AUDIO, "meta": {"metas": {"bpm": 110, "duration": float(duration)}}}
@@ -68,6 +70,34 @@ def test_generate_song_custom_lyrics(isolated_data_dir, monkeypatch):
     assert song.lyrics_mode == "CUSTOM_LYRICS"
     assert song.lyrics == "my own words"
     assert steps[0].detail == "Used custom lyrics"
+
+
+def test_generate_song_styling_options_forwarded(isolated_data_dir, monkeypatch):
+    lib = Library(str(isolated_data_dir))
+    captured = _install_fakes(monkeypatch)
+    song, steps = pipeline.generate_song(
+        lib, "Feels", "synthwave", "neon nights",
+        energy=8, bpm=112, key_scale="G major", time_signature="3/4",
+        vocal_style="Duet (two voices)",
+    )
+    prompt, _lyrics, _dur, _think, bpm, key, tsig = captured["music"][:7]
+    assert bpm == 112 and key == "G major" and tsig == "3/4"
+    # energy maps to a descriptor; vocal style is woven into the music prompt
+    assert "upbeat" in prompt and "Duet (two voices)" in prompt
+    # lyrics got the vocal-style instruction too
+    assert captured["lyrics"][3] == "Duet (two voices)"
+    assert song.lyrics_mode == "AUTO_LYRICS"
+
+
+def test_instrumental_drops_vocal_style_from_prompt(isolated_data_dir, monkeypatch):
+    lib = Library(str(isolated_data_dir))
+    captured = _install_fakes(monkeypatch)
+    pipeline.generate_song(lib, "Pure", "ambient", "calm", vocal=False,
+                           vocal_style="Gospel choir")
+    prompt = captured["music"][0]
+    assert "Gospel choir" not in prompt
+    # instrumental: no lyrics stage ran at all (fakes recorded nothing)
+    assert "lyrics" not in captured or captured["lyrics"][0] is None
 
 
 def test_cover_failure_is_nonfatal(isolated_data_dir, monkeypatch):

@@ -102,11 +102,39 @@ _STEP_FRACTIONS = {
 
 # ------------------------------------------------------------ section 1: create
 
-def create_song(title, genre, mood, vocal_choice, custom_lyrics, duration, thinking,
-                progress=gr.Progress()):
+GENRES = [
+    "upbeat indie pop", "synthwave", "lo-fi hip hop", "jazz", "bossa nova",
+    "acoustic folk", "indie rock", "rock", "alternative rock", "pop", "R&B",
+    "soul", "funk", "disco", "house", "techno", "EDM", "drum & bass",
+    "hip hop", "trap", "country", "bluegrass", "folk", "blues", "metal",
+    "classical", "ambient", "cinematic", "reggae", "ska", "world music",
+    "Custom…",
+]
+MOODS = [
+    "chill", "energetic", "melancholic", "romantic", "hopeful", "dark",
+    "dreamy", "nostalgic", "aggressive", "warm", "longing", "celebratory",
+    "mysterious", "peaceful",
+]
+VOCAL_STYLES = [
+    "Auto", "Soft female vocalist", "Bright male vocalist",
+    "Duet (two voices)", "Gospel choir", "Soulful rasp",
+    "Whispery intimate", "Belting power",
+]
+KEYS = ["Auto", "C major", "G major", "D major", "A major", "E major",
+        "F major", "B♭ major", "A minor", "E minor", "D minor", "G minor"]
+TIME_SIGNATURES = ["Auto", "3/4", "4/4", "6/8"]
+
+
+def create_song(title, genre_choice, genre_custom, mood_multi, mood_custom,
+                vocal_choice, vocal_style, energy, bpm, key_choice, tsig_choice,
+                custom_lyrics, duration, thinking, progress=gr.Progress()):
     title = (title or "").strip() or "Untitled Song"
-    genre = (genre or "").strip() or "upbeat indie pop"
-    mood = (mood or "").strip() or "hopeful and sunny"
+    genre = genre_choice if genre_choice and genre_choice != "Custom…" else (
+        (genre_custom or "").strip() or "upbeat indie pop")
+    mood_parts = [m for m in (mood_multi or []) if m]
+    if (mood_custom or "").strip():
+        mood_parts.append(mood_custom.strip())
+    mood = ", ".join(mood_parts) or "hopeful and sunny"
     vocal = vocal_choice == "Vocal"
     progress(0.05, desc="Starting…")
     try:
@@ -121,6 +149,11 @@ def create_song(title, genre, mood, vocal_choice, custom_lyrics, duration, think
             thinking=bool(thinking),
             vocal=vocal,
             progress_cb=_cb,
+            energy=int(energy),
+            bpm=int(bpm) if bpm and int(bpm) > 0 else None,
+            key_scale=None if key_choice == "Auto" else key_choice,
+            time_signature=None if tsig_choice == "Auto" else tsig_choice,
+            vocal_style=vocal_style,
         )
     except Exception as e:  # surfaced in the UI, never the terminal; retry is one click
         progress(0.0, desc="Failed")
@@ -267,15 +300,24 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     gr.Markdown("### 1 · Create a song — style, mood, duration, vocal or instrumental")
     with gr.Row():
         title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
-        genre_box = gr.Textbox(label="Genre / style", value="upbeat indie pop",
-                               placeholder="e.g. dreamy synthwave ballad")
-        mood_box = gr.Textbox(label="Mood / theme", value="hopeful and sunny",
-                              placeholder="e.g. late-night drive through the city")
+        genre_choice = gr.Dropdown(label="Genre / style", choices=GENRES,
+                                   value="upbeat indie pop", allow_custom_value=True)
+        mood_multi = gr.Dropdown(label="Mood / theme (pick any)", choices=MOODS,
+                                 multiselect=True, value=["hopeful"])
         vocal_radio = gr.Radio(choices=["Vocal", "Instrumental"], value="Vocal",
                                label="Track type")
-        duration_slider = gr.Slider(8, 60, value=20, step=2,
-                                    label="Track length (seconds)")
+        vocal_style = gr.Dropdown(label="Vocals style (vocal tracks)", choices=VOCAL_STYLES,
+                                  value="Auto")
         create_btn = gr.Button("🎬 Generate song + cover", variant="primary")
+    with gr.Row():
+        genre_custom = gr.Textbox(label="Custom genre…", placeholder="e.g. dreamy synthwave ballad",
+                                  visible=False)
+        mood_custom = gr.Textbox(label="…or your own mood", placeholder="late-night drive through the city")
+        duration_slider = gr.Slider(8, 60, value=20, step=2, label="Track length (seconds)")
+        energy_slider = gr.Slider(1, 10, value=5, step=1, label="Energy (1 = whisper, 10 = fever)")
+        bpm_slider = gr.Slider(60, 180, value=0, step=2, label="Tempo (BPM, 0 = auto)")
+        key_choice = gr.Dropdown(label="Key", choices=KEYS, value="Auto")
+        tsig_choice = gr.Dropdown(label="Time signature", choices=TIME_SIGNATURES, value="Auto")
     with gr.Accordion("Custom lyrics (optional — vocal tracks; blank = AI-written)",
                       open=False):
         lyrics_box = gr.Textbox(lines=5, placeholder="[Verse 1]\n…", label="")
@@ -320,10 +362,21 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     gr.Markdown("---\n🏔️ **CU Boulder Flatirons** · built with the class services on `dobolyi.com`")
 
     # -- wiring ---------------------------------------------------------
+    # Reveal the custom-genre box only when "Custom…" is chosen.
+    genre_choice.change(
+        lambda g: gr.update(visible=g == "Custom…"), inputs=genre_choice, outputs=genre_custom
+    )
+    # Vocals style is only meaningful for vocal tracks.
+    vocal_radio.change(
+        lambda v: gr.update(visible=v == "Vocal"),
+        inputs=vocal_radio, outputs=vocal_style,
+    )
+
     create_btn.click(
         create_song,
-        inputs=[title_box, genre_box, mood_box, vocal_radio, lyrics_box,
-                duration_slider, thinking_box],
+        inputs=[title_box, genre_choice, genre_custom, mood_multi, mood_custom,
+                vocal_radio, vocal_style, energy_slider, bpm_slider, key_choice,
+                tsig_choice, lyrics_box, duration_slider, thinking_box],
         outputs=[song_audio, cover_img, create_report, show_picker, library_gallery],
     )
 

@@ -16,10 +16,15 @@ for agentic use and is **never** used by this app.
 
 ## Features
 
-1. **Customizable song generation** — choose style, mood, length, and **vocal or
-   instrumental**. Vocal tracks get AI-written lyrics (class LLM, 9001) or your
-   own; **ACE-Step 1.5 XL Turbo** (9007) renders playable MP3 audio, added to the
-   library.
+1. **Customizable song generation** — a full styling panel: **genre** (30+
+   presets or type your own), **mood** (multi-select themes + free text),
+   **energy** (1–10), **tempo** (60–180 BPM or auto), **key** (12 choices),
+   **time signature** (3/4 · 4/4 · 6/8), **track length**, **vocals style**
+   (Auto / soft female / bright male / duet / choir / rasp / whisper / belting),
+   and **vocal or instrumental**. Vocal tracks get AI-written lyrics (class LLM,
+   9001) shaped by the chosen vocal style, or your own; **ACE-Step 1.5 XL Turbo**
+   (9007) renders playable MP3 audio honoring the key/tempo/meter (verified
+   live), added to the library.
 2. **Matching cover art** — the LLM turns each song into an album-art prompt and
    **FLUX.2-klein-4B** (9006) paints a 1024×1024 cover, displayed with the track.
 3. **Integrated AI DJ** — pick tracks (in queue order), optionally upload an
@@ -39,7 +44,9 @@ is playable the moment it starts.
 | --- | --- | --- |
 | ![Create tab](docs/screenshots/create_tab.png) | ![Jukebox tab](docs/screenshots/jukebox_tab.png) | ![Library tab](docs/screenshots/library_tab.png) |
 
-Left: form for title / genre / mood / track type (vocal|instrumental) / lyrics / duration.
+Left: styling panel — genre / mood / track type / vocals style, plus the
+second row of musical controls (length, energy, tempo, key, time signature) and
+custom lyrics.
 Middle: track queue picker, optional DJ voice-reference upload, “Build the show”.
 Right: covers gallery + track table (the three bundled sample tracks are shown).
 
@@ -102,7 +109,7 @@ python app.py                        # http://127.0.0.1:7860 (Gradio picks the
 
 ## Test results
 
-**Unit tests** (no network — every class service mocked): 43 passing,
+**Unit tests** (no network — every class service mocked): 48 passing,
 `python -m pytest -q`, run in CI on push.
 
 **Live end-to-end evidence** (run 2026-10-19 against the real class endpoints;
@@ -198,7 +205,7 @@ ai_jukebox/
 scripts/
   generate_samples.py  regenerates the 3 bundled samples (class endpoints)
   e2e_evidence.py      live end-to-end evidence run (writes evidence_output.json)
-tests/                 unit tests with mocked services (43)
+tests/                 unit tests with mocked services (48)
 docs/screenshots/      UI screenshots used in this report
 samples/               bundled pre-generated sample tracks (committed)
 ```

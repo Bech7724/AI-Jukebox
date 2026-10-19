@@ -45,8 +45,20 @@ def chat(messages: list[dict], max_tokens: int = 2048, temperature: float = 0.8,
     )
 
 
-def write_lyrics(title: str, genre: str, mood: str, structure: str = "ABABCB") -> str:
-    """Original, singable lyrics with structure tags for the music model."""
+def write_lyrics(title: str, genre: str, mood: str, structure: str = "ABABCB",
+                 vocal_style: str = "") -> str:
+    """Original, singable lyrics with structure tags for the music model.
+
+    `vocal_style` (e.g. "Duet (two voices)") adds a performance instruction
+    that also shapes the lyric form (two-part dialogue, anthemic chorus, …).
+    """
+    style_note = ""
+    if vocal_style and vocal_style.strip() and vocal_style.strip().lower() != "auto":
+        style_note = (
+            f"\n- The vocal performance is: {vocal_style.strip()}. "
+            "Write the lyrics to match that performance (e.g. duet = two voiced "
+            "parts, choir = anthemic unison lines, whispery = short intimate lines)."
+        )
     system = (
         "You are an accomplished songwriter. Write original, singable lyrics.\n"
         "Rules:\n"
@@ -55,7 +67,7 @@ def write_lyrics(title: str, genre: str, mood: str, structure: str = "ABABCB") -
         "- Short lines (4-9 syllables); match syllable counts across parallel lines.\n"
         "- End the chorus with the strongest, most repeatable hook line.\n"
         "- No clichés, no forced rhymes, no artist names, no song titles.\n"
-        "- 16-28 lines total. Output lyrics only — no commentary."
+        f"- 16-28 lines total. Output lyrics only — no commentary.{style_note}"
     )
     user = f'Write a song.\nTitle: "{title}"\nGenre/style: {genre}\nMood/theme: {mood}'
     return chat(

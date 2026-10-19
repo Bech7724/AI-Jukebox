@@ -20,11 +20,15 @@ from . import config, http
 def generate_song(prompt: str, lyrics: str = "", duration: int = 30,
                   audio_format: str = "mp3", thinking: bool = False,
                   model: str | None = None, vocal_language: str = "en",
+                  bpm: int | None = None, key_scale: str | None = None,
+                  time_signature: str | None = None,
                   poll_every: float = 5.0, timeout: int = 420) -> dict:
     """Generate a song from a text description and optional lyrics.
 
     Returns {"audio": <bytes>, "meta": {…}} where meta carries the server's
     generation info (metas / seed / models). Raises ServiceError on failure.
+    Optional musical styling (verified against the live service): `bpm`,
+    `key_scale` (e.g. "G major"), `time_signature` (e.g. "3/4").
     """
     base = config.base_url(config.MUSIC_PORT)
     payload: dict = {
@@ -37,6 +41,12 @@ def generate_song(prompt: str, lyrics: str = "", duration: int = 30,
     }
     if model:
         payload["model"] = model
+    if bpm:
+        payload["bpm"] = int(bpm)
+    if key_scale:
+        payload["key_scale"] = key_scale
+    if time_signature:
+        payload["time_signature"] = time_signature
 
     resp = http.post_json(f"{base}/release_task", payload, timeout=120)
     task_id = (resp.get("data") or {}).get("task_id")

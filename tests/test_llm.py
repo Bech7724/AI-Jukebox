@@ -58,7 +58,20 @@ def test_chat_retries_with_larger_budget_on_empty(monkeypatch):
 def test_write_lyrics_includes_theme(fake_llm):
     out = llm.write_lyrics("Neon Afterglow", "synthwave", "late-night drive")
     assert "Neon Afterglow" in fake_llm["payload"]["messages"][-1]["content"]
-    assert out == "probe-ok"
+    assert "late-night drive" in fake_llm["payload"]["messages"][-1]["content"]
+
+
+def test_write_lyrics_vocal_style_shapes_system_prompt(fake_llm):
+    llm.write_lyrics("Duet Song", "pop", "romantic", vocal_style="Duet (two voices)")
+    system = fake_llm["payload"]["messages"][0]["content"]
+    assert "Duet (two voices)" in system
+    assert "two voiced" in system
+
+
+def test_write_lyrics_auto_vocal_style_ignored(fake_llm):
+    llm.write_lyrics("Song", "pop", "fun", vocal_style="Auto")
+    system = fake_llm["payload"]["messages"][0]["content"]
+    assert "vocal performance is:" not in system
 
 
 def test_write_cover_prompt_asks_for_no_text(fake_llm):

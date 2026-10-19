@@ -55,6 +55,21 @@ def test_generate_song_full_flow(monkeypatch):
     assert release_payload["lyrics"] == "la la"
     assert release_payload["duration"] == 12
     assert release_payload["thinking"] is False
+    # styling params omitted unless explicitly requested
+    assert "bpm" not in release_payload
+    assert "key_scale" not in release_payload
+    assert "time_signature" not in release_payload
+
+
+def test_generate_song_styling_params_forwarded(monkeypatch):
+    t = FakeTransport([_query_result_response()])
+    monkeypatch.setattr(http, "post_json", t.post_json)
+    monkeypatch.setattr(http, "get_raw", t.get_raw)
+    music.generate_song(prompt="p", bpm=112, key_scale="G major", time_signature="3/4")
+    p = t.calls[0][1]
+    assert p["bpm"] == 112
+    assert p["key_scale"] == "G major"
+    assert p["time_signature"] == "3/4"
 
 
 def test_generate_song_polls_until_done(monkeypatch):

@@ -25,15 +25,20 @@ class StepResult:
 def generate_song(library: Library, title: str, genre: str, mood: str,
                   duration: int = 30, custom_lyrics: str | None = None,
                   thinking: bool = False, vocal: bool = True,
-                  progress_cb: Callable[[str], None] | None = None) -> tuple[Song, list[StepResult]]:
+                  progress_cb: Callable[[str], None] | None = None,
+                  energy: int | None = None, bpm: int | None = None,
+                  key_scale: str | None = None, time_signature: str | None = None,
+                  vocal_style: str = "") -> tuple[Song, list[StepResult]]:
     """Produce one full track: lyrics -> music -> cover art.
 
     `vocal=True` generates (or accepts) lyrics for a sung track; `vocal=False`
-    produces an instrumental (no lyrics sent to ACE-Step). Cover-art failure is
-    non-fatal (the track is still saved, with no cover); music failure aborts
-    because a track without audio is useless. `progress_cb` (optional) receives
-    a human-readable step name as each stage begins. Returns the saved Song
-    plus a step log for the UI.
+    produces an instrumental (no lyrics sent to ACE-Step). Optional styling:
+    `energy` (1-10) and `vocal_style` are woven into the music prompt; `bpm`,
+    `key_scale`, and `time_signature` are sent to ACE-Step (verified live).
+    Cover-art failure is non-fatal (the track is still saved, with no cover);
+    music failure aborts because a track without audio is useless.
+    `progress_cb` (optional) receives a human-readable step name as each stage
+    begins. Returns the saved Song plus a step log for the UI.
     """
     steps: list[StepResult] = []
 
@@ -53,7 +58,7 @@ def generate_song(library: Library, title: str, genre: str, mood: str,
         lyrics_mode = "CUSTOM_LYRICS"
     else:
         t = time.time()
-        lyrics = llm.write_lyrics(title, genre, mood)
+        lyrics = llm.write_lyrics(title, genre, mood, vocal_style=vocal_style)
         steps.append(
             StepResult("lyrics", "ok", f"Generated {len(lyrics.split())} words", time.time() - t)
         )
@@ -67,12 +72,25 @@ def generate_song(library: Library, title: str, genre: str, mood: str,
 
     # 3) Music -----------------------------------------------------------
     _step("Music (ACE-Step)")
-    music_prompt = f"{genre}, {mood}".strip(", ")
+    energy_word = ""
+    if energy:
+        for lo, hi, word in ((1, 3, "very relaxed"), (3, 5, "laid-back"),
+                             (5, 7, "moderate energy"), (7, 9, "upbeat"),
+                             (9, 11, "very high-energy")):
+            if lo <= int(energy) < hi:
+                energy_word = word
+                break
+    style_word = vocal_style.strip() if (vocal and vocal_style.strip()
+                                         and vocal_style.strip().lower() != "auto") else ""
+    music_prompt = ", ".join(
+        p for p in (genre, mood, energy_word, style_word) if p
+    ).strip(", ") or f"{genre}, {mood}"
     t = time.time()
     result = music.generate_song(
-        prompt=music_prompt, lyrics=lyrics, duration=duration, thinking=thinking
+        prompt=music_prompt, lyrics=lyrics, duration=duration, thinking=thinking,
+        bpm=bpm, key_scale=key_scale, time_signature=time_signature,
     )
-    steps.append(StepResult("music", "ok", f"{int(duration)}s track", time.time() - t))
+    steps.append(StepResult("music", "ok", f"{int(duration)}s track · {music_prompt}", time.time() - t))
 
     song = Song(
         id=Library.new_song_id(title),
