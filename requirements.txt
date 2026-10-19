@@ -1,0 +1,4 @@
+gradio>=4.44,<6
+python-dotenv>=1.0
+miniaudio>=1.60
+pytest>=8.0

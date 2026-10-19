@@ -1,0 +1,98 @@
+[
+  {
+    "id": "neon-afterglow-9bfbc3",
+    "title": "Neon Afterglow",
+    "genre": "synthwave",
+    "mood": "late-night drive through neon-lit streets",
+    "created": 1792429777.752626,
+    "audio_path": "neon-afterglow-9bfbc3/song.mp3",
+    "cover_path": "neon-afterglow-9bfbc3/cover.png",
+    "lyrics": "[Intro]\nGlass reflects the passing light\nTires hum against the night\nStatic fades into the blue\nCity breathes, the engines too\n\n[Verse 1]\nStreetlamps bleed upon the glass\nTires trace the wet black line\nConsole lights paint the driver\u2019s face\nTime dissolves in endless space\n\n[Pre-Chorus]\nGlass rolls up to trap the heat\nPulse begins to match the beat\nMileage climbs beyond the chart\nCity fades behind the curve\n\n[Chorus]\nChase the streaks of liquid gold\nDrive until the edges blur\nLeave the waking world behind\nNeon afterglow pulls you home\n\n[Bridge]\nWires spark across the dash\nSignals slip into the gray\nTires hum a steady tone\nHorizon melts away\n\n[Outro]\nEngine cools, lights go dim\nBreathing slows, hands relax\nDawn arrives beyond the ridge\nQuiet settles on the wheels",
+    "cover_prompt": "A retro-futuristic digital painting in deep magenta, electric cyan, and molten gold captures a first-person view through a rain-streaked windshield during a solitary midnight drive. Volumetric neon glow washes over a glowing dashboard while wet asphalt mirrors long streaks of ambient light. Cinematic motion blur and a receding perspective grid create a hypnotic, weightless atmosphere that perfectly mirrors the drifting, nocturnal journey.",
+    "music_prompt": "synthwave, late-night drive through neon-lit streets",
+    "meta": {
+      "metas": {
+        "bpm": 100,
+        "duration": 16.0,
+        "genres": "N/A",
+        "keyscale": "C major",
+        "timesignature": "4",
+        "prompt": "synthwave, late-night drive through neon-lit streets",
+        "lyrics": "[Intro]\nGlass reflects the passing light\nTires hum against the night\nStatic fades into the blue\nCity breathes, the engines too\n\n[Verse 1]\nStreetlamps bleed upon the glass\nTires trace the wet black line\nConsole lights paint the driver\u2019s face\nTime dissolves in endless space\n\n[Pre-Chorus]\nGlass rolls up to trap the heat\nPulse begins to match the beat\nMileage climbs beyond the chart\nCity fades behind the curve\n\n[Chorus]\nChase the streaks of liquid gold\nDrive until the edges blur\nLeave the waking world behind\nNeon afterglow pulls you home\n\n[Bridge]\nWires spark across the dash\nSignals slip into the gray\nTires hum a steady tone\nHorizon melts away\n\n[Outro]\nEngine cools, lights go dim\nBreathing slows, hands relax\nDawn arrives beyond the ridge\nQuiet settles on the wheels"
+      },
+      "prompt": "synthwave, late-night drive through neon-lit streets",
+      "lyrics": "[Intro]\nGlass reflects the passing light\nTires hum against the night\nStatic fades into the blue\nCity breathes, the engines too\n\n[Verse 1]\nStreetlamps bleed upon the glass\nTires trace the wet black line\nConsole lights paint the driver\u2019s face\nTime dissolves in endless space\n\n[Pre-Chorus]\nGlass rolls up to trap the heat\nPulse begins to match the beat\nMileage climbs beyond the chart\nCity fades behind the curve\n\n[Chorus]\nChase the streaks of liquid gold\nDrive until the edges blur\nLeave the waking world behind\nNeon afterglow pulls you home\n\n[Bridge]\nWires spark across the dash\nSignals slip into the gray\nTires hum a steady tone\nHorizon melts away\n\n[Outro]\nEngine cools, lights go dim\nBreathing slows, hands relax\nDawn arrives beyond the ridge\nQuiet settles on the wheels",
+      "seed_value": "729816478,2880127609",
+      "lm_model": "acestep-5Hz-lm-4B",
+      "dit_model": "acestep-v15-xl-turbo",
+      "duration_requested": 16,
+      "audio_format": "mp3"
+    },
+    "lyrics_mode": "AUTO_LYRICS",
+    "vocal": true
+  },
+  {
+    "id": "morning-gold-dc1657",
+    "title": "Morning Gold",
+    "genre": "upbeat indie pop",
+    "mood": "first light over the bay, full of hope",
+    "created": 1792429856.467736,
+    "audio_path": "morning-gold-dc1657/song.mp3",
+    "cover_path": "morning-gold-dc1657/cover.png",
+    "lyrics": "[Intro]\nSalt air wakes the dock\nTides pull back the night\n\n[Verse 1]\nFrost melts off the pine\nDew drops fall in time\nWindows catch the flame\nShadows lose their claim\n\n[Pre-Chorus]\nPaint the wooden floor\nSweep the dust aside\nSlide the window pane\nLet the daylight in\n\n[Chorus]\nSilver wakes the bay\nClears the salt-stained air\nWe are stepping into gold\nCatch the morning light\n\n[Bridge]\nSteam rises from cups\nSeagulls call the fleet\nLines are cast against the wind\nRopes begin to strain\n\n[Outro]\nGold spills on the sand\nDay begins to climb\nWe are sailing past the break\nToward the open sea",
+    "cover_prompt": "Vibrant indie-pop collage style featuring a wooden sailboat gliding toward a radiant sunrise over a shimmering bay. Colors transition from deep indigo shadows to explosive amber and rose-gold light reflecting on wet sand and rippling water. Dynamic composition with pine branches framing the scene, capturing the uplifting energy of new beginnings and salt-kissed hope. High contrast, textured paper grain, cinematic backlighting.",
+    "music_prompt": "upbeat indie pop, first light over the bay, full of hope",
+    "meta": {
+      "metas": {
+        "bpm": 42,
+        "duration": 16.0,
+        "genres": "N/A",
+        "keyscale": "G major",
+        "timesignature": "4",
+        "prompt": "upbeat indie pop, first light over the bay, full of hope",
+        "lyrics": "[Intro]\nSalt air wakes the dock\nTides pull back the night\n\n[Verse 1]\nFrost melts off the pine\nDew drops fall in time\nWindows catch the flame\nShadows lose their claim\n\n[Pre-Chorus]\nPaint the wooden floor\nSweep the dust aside\nSlide the window pane\nLet the daylight in\n\n[Chorus]\nSilver wakes the bay\nClears the salt-stained air\nWe are stepping into gold\nCatch the morning light\n\n[Bridge]\nSteam rises from cups\nSeagulls call the fleet\nLines are cast against the wind\nRopes begin to strain\n\n[Outro]\nGold spills on the sand\nDay begins to climb\nWe are sailing past the break\nToward the open sea"
+      },
+      "prompt": "upbeat indie pop, first light over the bay, full of hope",
+      "lyrics": "[Intro]\nSalt air wakes the dock\nTides pull back the night\n\n[Verse 1]\nFrost melts off the pine\nDew drops fall in time\nWindows catch the flame\nShadows lose their claim\n\n[Pre-Chorus]\nPaint the wooden floor\nSweep the dust aside\nSlide the window pane\nLet the daylight in\n\n[Chorus]\nSilver wakes the bay\nClears the salt-stained air\nWe are stepping into gold\nCatch the morning light\n\n[Bridge]\nSteam rises from cups\nSeagulls call the fleet\nLines are cast against the wind\nRopes begin to strain\n\n[Outro]\nGold spills on the sand\nDay begins to climb\nWe are sailing past the break\nToward the open sea",
+      "seed_value": "2160035769,3592502534",
+      "lm_model": "acestep-5Hz-lm-4B",
+      "dit_model": "acestep-v15-xl-turbo",
+      "duration_requested": 16,
+      "audio_format": "mp3"
+    },
+    "lyrics_mode": "AUTO_LYRICS",
+    "vocal": true
+  },
+  {
+    "id": "midnight-caf-a2d015",
+    "title": "Midnight Caf\u00e9",
+    "genre": "lo-fi jazz",
+    "mood": "rain on the window, cozy and warm",
+    "created": 1792429888.662962,
+    "audio_path": "midnight-caf-a2d015/song.mp3",
+    "cover_path": "midnight-caf-a2d015/cover.png",
+    "lyrics": "",
+    "cover_prompt": "A soft lo-fi watercolor frames a cozy caf\u00e9 interior behind a rain-streaked window. Warm amber steam rises from a ceramic mug beside a worn vinyl sleeve, while muted terracotta chairs recede into shallow depth of field. Gentle streetlamp glow filters through droplets, casting hazy shadows on polished wood. This intimate composition balances quiet solitude with enveloping warmth, echoing the slow, dreamy pulse of late-night jazz.",
+    "music_prompt": "lo-fi jazz, rain on the window, cozy and warm",
+    "meta": {
+      "metas": {
+        "bpm": 88,
+        "duration": 16.0,
+        "genres": "N/A",
+        "keyscale": "E major",
+        "timesignature": "4",
+        "prompt": "lo-fi jazz, rain on the window, cozy and warm",
+        "lyrics": ""
+      },
+      "prompt": "lo-fi jazz, rain on the window, cozy and warm",
+      "lyrics": "",
+      "seed_value": "4135692537,890295315",
+      "lm_model": "acestep-5Hz-lm-4B",
+      "dit_model": "acestep-v15-xl-turbo",
+      "duration_requested": 16,
+      "audio_format": "mp3"
+    },
+    "lyrics_mode": "INSTRUMENTAL",
+    "vocal": false
+  }
+]
