@@ -4,6 +4,7 @@
 !.env.example
 *.pem
 *.key
+class-endpoints*.txt
 
 # Generated app data: music, covers, DJ audio, user content, voice refs
 data/

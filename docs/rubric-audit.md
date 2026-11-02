@@ -57,3 +57,7 @@ A two-track default-voice show was built through the live UI. With cues 0.00 / 1
 ## Display cleanup
 
 Matched dark-theme colors to the light palette to keep labels readable, constrained the page width, and added stacked controls below 600 pixels. A browser check at a 644-pixel viewport measured a 644-pixel page with readable controls and no page overflow. The saved reviewed screenshot shows this view.
+
+## Redesign - November 1, 2026
+
+The interface was redesigned on the `ui-redesign-dark` branch (pull request #1): a dark theme with one pink accent, a single Studio card (description, mood chips, style, segmented track type and length, More options), a latest-tracks grid with a live step-by-step status card, a setlist that starts with the most recent tracks, and click-to-preview covers. The light-palette notes above describe the earlier version. After the redesign, 65 unit tests pass and a live run against the class services covered a vocal song, an instrumental, a four-track show, MP3 and WAV voice references, and a fresh install of the committed files; the README's test results record the details. Desktop and 390-pixel phone widths were checked in the browser with no page overflow.

@@ -77,7 +77,7 @@ def test_waveform_svg_emits_mirrored_wave_and_markers(tmp_path):
     # cue markers with labels (dasharray lines; not the linearGradient tag)
     assert svg.count("<line ") == 2
     assert "Neon" in svg and "DJ" in svg
-    assert "#a6503c" in svg  # terra accent
+    assert "#ff4f8b" in svg  # neon accent
     assert "url(#jkwave)" in svg  # gradient stroke
 
 
