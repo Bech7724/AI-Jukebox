@@ -207,13 +207,7 @@ cover prompt 2048, DJ script 1024). Regression tests cover both paths.
 
 ## Decision Judgement - Jaxon's Perspective
 
-What I think is cool about this project is that I can start with an idea for a song and turn it into a whole listening experience. I can choose the style, mood, and length, generate music with its own cover art, and then have an AI DJ introduce the songs. The connection between those pieces is my favorite part. It makes the dashboard feel like a small radio station that I can customize instead of just a place to generate one audio file.
-
-My contribution was helping shape the project into a usable DJ dashboard and using AI assistance to build, review, and improve it. I wanted the song controls, playback queue, and library together so someone could follow the process from creating a track to building a show. I also like the Boulder-inspired look because it gives the project a connection to CU and makes it feel more personal. The lighter colors and clearly labeled sections make the controls easier to read and find.
-
-One design decision I think worked especially well was combining the DJ commentary and songs into one continuous audio file. Once I press play, the show can move through the introductions and music without needing me to start every track separately. The latest live test produced a 41.77-second show with the speech and songs placed in sequence and short gaps between them. That gives me concrete evidence for why this approach makes sense, although a full listening check is still something our team needs to do.
-
-I also took responsibility for getting the project checked against the assignment rubric and confirming that it uses the required class endpoints. That review caught a queue-order bug: the show was following the library's order instead of the order selected by the user. With AI assistance, that was corrected and a regression test was added. The experience showed me why a dashboard looking finished is only part of the job. I need to check that its behavior matches what the controls promise. What I am most pleased with is bringing several different AI services together into something creative that someone can actually interact with, while being clear about what has been tested and what still needs our team's review.
+I think this project is cool because it turns a song idea into a custom radio show, complete with music, cover art, and an AI DJ. I helped shape the dashboard and used AI assistance to build and improve it. I especially like the Boulder-inspired design and continuous playback. Checking the rubric and fixing the queue order taught me that the app needs to work as clearly as it looks.
 
 ## Design judgment
 
