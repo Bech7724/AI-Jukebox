@@ -15,7 +15,7 @@ class ServiceError(RuntimeError):
 
 
 def _headers() -> dict:
-    if not config.API_KEY:
+    if not config.API_KEY or config.API_KEY.strip() == "<your-class-key>":
         raise ServiceError(
             "AIJ_API_KEY is not set. Copy .env.example to .env and fill in the "
             "class-service key from class-endpoints.txt (never commit it)."

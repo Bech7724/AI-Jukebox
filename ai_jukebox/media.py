@@ -11,6 +11,7 @@ overlap.
 from __future__ import annotations
 
 import wave
+from html import escape
 from pathlib import Path
 
 import miniaudio
@@ -72,18 +73,15 @@ def _mono_peaks(path: str, buckets: int = 220) -> list[float]:
         sample_rate=RATE,
     )
     raw = dec.samples
-    step = max(1, len(raw) // 2 // buckets)  # 2 bytes per sample (mono s16)
     peaks: list[float] = []
     for i in range(buckets):
-        lo = i * step
-        hi = min(lo + step, len(raw) // 2)
-        window = raw[lo * 2: hi * 2]
+        lo = i * len(raw) // buckets
+        hi = (i + 1) * len(raw) // buckets
+        window = raw[lo:hi]
         if not window:
             peaks.append(0.0)
             continue
-        m = max(abs(int.from_bytes(window[j:j + 2], "little", signed=True))
-                for j in range(0, len(window) - 1, 2))
-        peaks.append(m / 32767.0)
+        peaks.append(min(1.0, max(abs(sample) for sample in window) / 32768.0))
     return peaks
 
 
@@ -127,9 +125,10 @@ def waveform_svg(path: str, width: int = 640, height: int = 120,
         "stroke-linejoin='round' opacity='0.95'/>" % bottom,
     ]
     if markers:
-        fmt = _format_time
+        info = miniaudio.get_file_info(path)
+        duration = info.num_frames / info.sample_rate
         for t_sec, label in markers:
-            x = t_sec / 30.0 * width  # 30 s scale (shows are 20-40 s per segment)
+            x = t_sec / duration * width if duration else 0
             x = min(max(x, 2.0), width - 2.0)
             parts.append(
                 "<line x1='%.1f' y1='4' x2='%.1f' y2='%d' stroke='#b8966a' "
@@ -137,11 +136,7 @@ def waveform_svg(path: str, width: int = 640, height: int = 120,
             )
             parts.append(
                 "<text x='%.1f' y='10' font-size='8' fill='#8a8172' "
-                "text-anchor='middle'>%s</text>" % (x, label)
+                "text-anchor='middle'>%s</text>" % (x, escape(label))
             )
     parts.append("</svg>")
     return "\n".join(parts)
-
-
-def _format_time(seconds: float) -> str:
-    return f"{int(seconds // 60)}:{int(seconds % 60):02d}"

@@ -1,288 +1,131 @@
-# 🎵 AI Jukebox
+# AI Jukebox
 
-[![CI](https://github.com/Bech7724/AI-Jukebox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Bech7724/AI-Jukebox/actions/workflows/ci.yml)
-
-Generate a **song**, its **cover art**, and a full **jukebox show with a spoken DJ**
-— every AI feature runs on the class model services (`dobolyi.com` ports
-9001 / 9006 / 9007 / 9008, see `class-endpoints.txt`). Port 9000 is reserved
-for agentic use and is **never** used by this app.
+Create vocal or instrumental songs with matching cover art, then arrange them into a continuous show with spoken DJ introductions. All AI generation uses the supplied class services.
 
 ## Live demo
 
-🔗 **https://f9b145b4eafa152fb6.gradio.live** — refreshed November 1, 2026; hosted on the local Mac.
-The Mac must remain awake and the app process must remain running.
+[Open AI Jukebox](https://ac393470219442d944.gradio.live/)
 
-> Share links rotate: this public URL dies with the app process and expires
-> automatically (~1 week). When it stops working, refresh it by launching
-> `AIJ_SHARE=1 python app.py` on the host machine and replacing this URL with
-> the new `gradio.live` link. The local Setup and use below always works.
+This temporary Gradio link requires the host Mac to stay awake and the app process to keep running. It expires after about one week. Restart with `AIJ_SHARE=1 python app.py` and update this link when needed. The downloadable app is the version to submit for independent testing.
 
-## Rubric review - November 1, 2026
+## Features and controls
 
-See [the detailed rubric audit](docs/rubric-audit.md) for fresh class-service results,
-the queue-order fix, 54 passing tests, and the remaining teammate verification
-and review requirements. The historical October 19 results below are retained
-with their date; fresh measured values are in `scripts/evidence_output.json`.
+The dashboard has three numbered sections on one page:
 
-## Features
+1. **Create a song:** enter a title, genre and mood; select Vocal or Instrumental and a length of 8-60 seconds. Optional settings include energy, tempo (0 = automatic; slider up to 220 BPM), key, time signature and vocal style. Blank vocal lyrics are written by Qwen; custom lyrics are also accepted. **Generate song + cover** creates playable audio, requests matching artwork, and updates the library. Musical settings are requests to the model; exact musical adherence is not guaranteed.
+2. **Playback queue - AI DJ:** select songs in order and optionally upload an MP3/WAV voice reference. **Build the show** writes and speaks song-specific introductions, then mixes the introductions and songs into one WAV. Press play if the browser blocks autoplay. Native play/pause and the seek bar control playback; **Prev / Next** move between segment cues (DJ intros and songs). **Shuffle queue** changes the order for the next show you build.
+3. **Library:** view covers and track metadata, rename or delete a track, and refresh the display. Newly generated tracks persist in the local library.
 
-1. **Customizable song generation** — a full styling panel: **genre** (30+
-   presets or type your own), **mood** (multi-select themes + free text),
-   **energy** (1–10), **tempo** (60–180 BPM or auto), **key** (12 choices),
-   **time signature** (3/4 · 4/4 · 6/8), **track length**, **vocals style**
-   (Auto / soft female / bright male / duet / choir / rasp / whisper / belting),
-   and **vocal or instrumental**. Vocal tracks get AI-written lyrics (class LLM,
-   9001) shaped by the chosen vocal style, or your own; **ACE-Step 1.5 XL Turbo**
-   (9007) renders playable MP3 audio honoring the key/tempo/meter (verified
-   live), added to the library.
-2. **Matching cover art** — the LLM turns each song into an album-art prompt and
-   **FLUX.2-klein-4B** (9006) paints a 1024×1024 cover, displayed with the track.
-3. **Integrated AI DJ** — pick tracks (in queue order), optionally upload an
-   **MP3/WAV voice reference** to clone the DJ's voice (or keep the default), and
-   build a show. The DJ — **Qwen-written** (9001), **Chatterbox-spoken** (9008) —
-   introduces every track; the show is **mixed into one continuous track** with
-   native play/pause/skip controls: the queue advances automatically and speech
-   never overlaps music.
+**Surprise me** fills in random song settings; it does not generate audio until you press **Generate song + cover**. **Music planning** enables the music service's planning option and may increase generation time; improved quality is not guaranteed.
 
-Three pre-generated sample tracks (titles + covers, AI-written lyrics only)
-ship under `samples/` and are loaded into the library on first run so the app
-is playable the moment it starts.
-
-**Extras (unique touches):** 🎲 **Surprise me** rolls a random title + full
-styling in one click (instant demo jam), 🔀 **Shuffle queue** randomizes the
-set order, ✏️ **Rename** retitles any track, and the queue player gets a
-**waveform of the mixed show** with cue markers plus **⏮ Prev / ⏭ Next**
-buttons that jump between tracks in the continuous mix.
+Three generated samples ship with the app: **Neon Afterglow**, **Morning Gold**, and **Midnight Café**. Select them in the queue and build a show to hear them through the player. The two vocal samples have AI-generated lyrics; Midnight Café is instrumental. `scripts/generate_samples.py` documents their generation through the class pipeline. The sample audio, artwork and metadata are included under `samples/` and copied into an empty library on first launch.
 
 ## Screenshots
 
-| Create a song | Jukebox show | Library |
+These screenshots show the interface before the latest wording and reliability fixes.
+
+| Create a song | Playback queue | Library |
 | --- | --- | --- |
-| ![Create tab](docs/screenshots/create_tab.png) | ![Jukebox tab](docs/screenshots/jukebox_tab.png) | ![Library tab](docs/screenshots/library_tab.png) |
-
-## Rubric at a glance
-
-| # | Rubric requirement | Where it lives in this repo | Status 2026-10-19 |
-| --- | --- | --- | --- |
-| 1 | Deploy from the submitted ZIP; test all three core features using the class endpoints | `run.sh` / `run.bat`, `scripts/make_zip.py --check`, checklist §0 | ✅ machine-verified: fresh unzip → new venv → `pip install` → boots clean, seeded library served, HTTP 200 |
-| 2 | Sample songs: lyrics **AI-generated** | `samples/` (Neon Afterglow, Morning Gold = AI lyrics; Midnight Café instrumental) | ✅ evidence row 1a (128-word AI lyrics), seeded on first run |
-| 3 | Newly generated songs join the **playable library** and persist during the session | `ai_jukebox/library.py` (persistent index), Queue + gallery wiring | ✅ wiring audited via served config; rename persists across reload (tests) |
-| 4 | Queue **auto-advances**; DJ speech + music in sequence, **no overlap** | miniaudio one-WAV mixer (0.35 s cushioned gaps), `ai_jukebox/music.py` + `dj.py` | ✅ cues 0.00/10.63/26.98/39.21 s; skip 20→26.98→10.63 s (real handler); 53 s real mix |
-| 5 | README has **screenshots** | this file, §Screenshots (3 validated PNGs) | ✅ |
-| 6 | **Tests** with inputs / expected / actual, incl. ≥1 failure case | §Test results table (rows 1a–3b, A, B) | ✅ 53 unit tests + live E2E, two failure cases, one fixed |
-| 7 | **Completed vs. unchecked** clearly separated | §Completed vs. unchecked + `scripts/verification_checklist.md` (ticked) | ✅ updated today; only human-mouse items remain |
-| 8 | **Design judgment** | §Design; Flatirons light palette, pop pass documented | ✅ high-contrast, validated visually |
-| 9 | Credentials stay server-side; submissions leak nothing | `.env` gitignored, placeholders only in examples; `make_zip.py --check` | ✅ CLEAN audit incl. today's ZIP |
-
-Left: styling panel — genre / mood / track type / vocals style, plus the
-second row of musical controls (length, energy, tempo, key, time signature) and
-custom lyrics.
-Middle: track queue picker, optional DJ voice-reference upload, “Build the show”.
-Right: covers gallery + track table (the three bundled sample tracks are shown).
-
-## Service map
-
-| Port | Model (per class-endpoints.txt) | Used for | API |
-| --- | --- | --- | --- |
-| 9001 | `cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit` | lyrics, cover prompt, DJ script | vLLM `/v1/chat/completions` |
-| 9006 | `black-forest-labs/FLUX.2-klein-4B` | cover art | vLLM-Omni `/v1/images/generations` |
-| 9007 | `ACE-Step/acestep-v15-xl-turbo` | music (async task API) | `release_task` → poll → download |
-| 9008 | Chatterbox Multilingual V3 | DJ voice (default or cloned) | `/v1/audio/speech` |
+| ![Song creation section](docs/screenshots/create_tab.png) | ![Playback queue section](docs/screenshots/jukebox_tab.png) | ![Library section](docs/screenshots/library_tab.png) |
 
 ## Setup and use
 
-**Dependencies:** Python 3.10+, `pip install -r requirements.txt`
-(`gradio`, `python-dotenv`, `miniaudio`). **No additional software** — mixing is
-done in-process (miniaudio decodes MP3/WAV; stdlib writes WAV; **ffmpeg is not
-required**).
+Requirements: **Python 3.10+**, pip, network access to the class services, and the class API key. `requirements.txt` lists Gradio, python-dotenv, miniaudio and pytest. Audio mixing runs in-process; ffmpeg is not required. Windows setup has a launcher but was not retested in this review.
 
-**Endpoint configuration** (`.env.example`, no credentials):
+From the extracted repository directory:
 
 ```bash
-AIJ_BASE_HOST=http://dobolyi.com     # class service network
-AIJ_API_KEY=<your-class-key>         # from class-endpoints.txt — NEVER commit
-AIJ_LLM_PORT=9001                    # Qwen text LLM
-AIJ_IMAGE_PORT=9006                  # FLUX cover art
-AIJ_MUSIC_PORT=9007                  # ACE-Step music
-AIJ_TTS_PORT=9008                    # Chatterbox voice
-AIJ_DATA_DIR=                        # default: ./data (gitignored)
-```
-
-**Supplying credentials securely:** copy `.env.example` → `.env` and fill in
-`AIJ_API_KEY` with the class key. `.env` is gitignored; the app refuses to make
-requests until a key is set, and no key ever appears in code, docs, logs, or
-GitHub. Keep `.env` and `data/` out of any submission archive too.
-
-**Launch:**
-
-```bash
-bash run.sh                            # one command: creates .venv + .env.example,
-                                       # installs deps, starts on 127.0.0.1:7860
-# or manually:
-python3 -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env                   # fill AIJ_API_KEY
-python app.py                          # http://127.0.0.1:7860
-# If 7860 is in use: AIJ_PORT=7861 python app.py
-# optional public link: AIJ_SHARE=1 python app.py
+cp .env.example .env                # Windows: copy .env.example .env
 ```
 
-**Final submission:** supply the shared repository URL, the exact submitted
-commit ID, and a ZIP downloaded from GitHub for that same commit. Have a
-teammate extract it, follow this README, and test all three features with
-the class credentials. Record teammate contributions and reviews through
-GitHub issues and pull requests. See the audit above for unchecked items.
+Edit `.env` and replace `AIJ_API_KEY=<your-class-key>` with the supplied class key. Keep the file private. The UI can open without a valid key, but generation requests need one.
 
-**Development archive:** `python scripts/make_zip.py` builds
-`dist/ai-jukebox-submission.zip` (7.4 MB, deploy-from-ZIP ready) and
-`python scripts/make_zip.py --check` verifies it — asserting no `.env`,
-`data/`, or `samples/_stage/` content ever ships. `dist/` is gitignored.
+```bash
+python app.py                       # http://127.0.0.1:7860
+# If that port is busy:
+AIJ_PORT=7861 python app.py
+# Optional temporary public link:
+AIJ_PORT=7861 AIJ_SHARE=1 python app.py
+```
 
-**Exercising the three core features:**
+On Windows, set environment variables using `set AIJ_PORT=7861` and `set AIJ_SHARE=1` before launching. The convenience launchers `bash run.sh` and `run.bat` create a virtual environment and install dependencies when no `.venv` exists, and copy `.env.example` to `.env` when needed. Fill in the key before generating.
 
-1. **Custom song** — *Create a song* tab: title + genre + mood, choose
-   **Vocal** (AI lyrics) or **Instrumental**, set duration → *Generate* →
-   playable MP3 + lyrics + production log; the track joins the library.
-2. **Cover art** — generated automatically with every song; verify it in the
-   right-hand preview and in the Library gallery, captioned with its track.
-3. **AI DJ** — *Jukebox show* tab: use **Play** on the samples or generate your
-   own first. Select tracks in order, optionally upload an **MP3/WAV voice
-   reference** (blank = default voice) → *Build the show* → play the single
-   continuous mix: DJ speech between every track, cue sheet with times, covers
-   for each queued track.
+Configuration example (placeholders only):
 
-## Test results
+```dotenv
+AIJ_BASE_HOST=http://dobolyi.com
+AIJ_API_KEY=<your-class-key>
+AIJ_LLM_PORT=9001
+AIJ_IMAGE_PORT=9006
+AIJ_MUSIC_PORT=9007
+AIJ_TTS_PORT=9008
+AIJ_DATA_DIR=
+```
 
-**Unit tests** (no network — every class service mocked): 53 passing,
-`python -m pytest -q`, run in CI on push.
+An empty `AIJ_DATA_DIR` uses the repository's gitignored `data/` directory.
 
-**Live end-to-end evidence** (run 2026-10-19 against the real class endpoints;
-inputs / expected / actual recorded by `scripts/e2e_evidence.py`, full JSON in
-`scripts/evidence_output.json`):
+| Required service | Port | Model | Request format |
+| --- | --- | --- | --- |
+| Text: lyrics, artwork prompts, DJ scripts | 9001 | cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit | `/v1/chat/completions` |
+| Cover art | 9006 | black-forest-labs/FLUX.2-klein-4B | `/v1/images/generations` |
+| Music | 9007 | ACE-Step/acestep-v15-xl-turbo | `/release_task`, poll `/query_result`, download audio |
+| DJ speech | 9008 | Chatterbox Multilingual V3 (`chatterbox-v3`) | `/v1/audio/speech` |
 
-| # | Feature | Input | Expected | Actual result | Status |
-| --- | --- | --- | --- | --- | --- |
-| 1a | Vocal song | “Golden Hour” chillhop, 12 s | playable MP3, AI lyrics, metadata | 128-word lyrics; 192,812 B MP3 (ID3); 88 bpm, E major; music step 5.8 s | ✅ PASS |
-| 1b | Instrumental | “Empty Streets” ambient, 10 s, vocal=off | no lyrics sent | 0 lyric chars; mode INSTRUMENTAL | ✅ PASS |
-| 2 | Cover art | Golden Hour (LLM cover prompt) | new FLUX cover with the track | cover.png exists, **1024×1024** | ✅ PASS |
-| 3a | DJ show | 2 tracks, **default voice** | Qwen script + Chatterbox speech between songs, one continuous mix | 2 spoken intros (ID3); 4 segments; cue times 0.0 / 10.35 / 22.70 / 33.25 s; **43.2 s mix** | ✅ PASS |
-| 3b | DJ voice clone | base64 MP3 reference (as the UI upload sends) | intro in uploaded voice | 36-word script; 171,692 B MP3 (ID3) | ✅ PASS |
-| A | Failure: bad key | `AIJ_API_KEY=wrong-key` | understandable error; nothing saved | `HTTP 401 … "Missing or invalid API key."` surfaced as a UI error; recovery = fix `.env`, retry | ✅ PASS |
-| B | Failure: LLM budget | `max_tokens=1536` (song lyrics) | non-empty lyrics | `finish_reason=length`, `reasoning_tokens == max_tokens`, content `None` (4/4 attempts) — **investigated and fixed** | 🔧 FIXED |
+Port 9000 is reserved for Hermes and is rejected by the app's service URL builder. No paid AI service is used. Credentials stay in server-side request headers. Never commit `.env`, user uploads or reference recordings. Gradio may store uploads in its temporary cache; generated media and library records use `data/`. Neither belongs in the submitted ZIP.
 
-Case B in full: the Qwen3.6-35B reasoning pass still runs even with
-`chat_template_kwargs: {"thinking": false}`. When it consumes the whole token
-budget the reply comes back empty — it took a live request (not unit tests) to
-surface this. Fix: `chat()` now retries with a doubled budget until content
-arrives (capped), and every call site uses a generous budget (lyrics 4096,
-cover prompt 2048, DJ script 1024). Regression tests cover both paths.
+## Test results - November 1, 2026
 
-**Unresolved problems**
+Run `python -m pytest -q`. The suite has **59 passing tests**, including queue ordering, immediate library-table updates, blank storage defaults, reserved-port protection and waveform amplitude/timing. These unit tests use mocked class services; they do not establish live service availability.
 
-- The public share link rotates (~1 week) and dies with the app process; the
-  README documents the refresh procedure. A truly permanent URL would need
-  infrastructure outside the class constraints (no paid services).
-- ACE-Step is an async queue: under class load a task can take longer than the
-  7-minute timeout, which raises a readable error (recoverable by retry).
-- FLUX covers are ~3.3 MB PNGs (kept full-res for print quality; repo size
-  impact ~10 MB for the bundled samples).
+The separate live run recorded in [`scripts/evidence_output.json`](scripts/evidence_output.json) used the configured class credentials. Audio files were also decoded to check validity and duration.
 
-**Completed vs. unchecked — clearly separated**
+| Test input | Expected | Actual result |
+| --- | --- | --- |
+| Golden Hour; chillhop; warm sunset/easygoing; vocal; 12 seconds | AI lyrics, playable song saved in library | 124 words; 192,812-byte MP3; decoded duration 12.00 seconds |
+| Empty Streets; ambient; quiet rainfall; instrumental; 10 seconds | No lyrics; playable instrumental | Empty lyrics; INSTRUMENTAL mode; decoded duration 10.00 seconds |
+| Generate covers for both songs | New FLUX image for each song | Both have valid PNG files; Golden Hour is 1024 x 1024 |
+| Build a two-song show; default voice | Song-specific Qwen scripts, Chatterbox speech, sequential mix | Two intros; four segments; 44.1-second WAV; cues 0.00 / 12.03 / 24.38 / 34.09 seconds |
+| MP3 reference sent through the voice-reference client | Speech response using reference input | 45-word script; 177,836-byte MP3; perceived similarity not evaluated |
+| Deliberately wrong API key | Readable rejection | HTTP 401 with an invalid-key message |
+| Restore correct key and retry speech | Request succeeds | 24,236-byte speech response |
 
-- ✅ Completed & verified: all unit tests; live probes of all four endpoints;
-  live E2E of the 3 core features + voice clone + 2 failure cases; app boots
-  and the three tabs render (screenshots above, validated visually); **fresh
-  ZIP deploy on a clean copy (new venv, full pip install) verified 2026-10-19**;
-  live wiring audit (every handler's inputs/outputs match, no dangling ids).
-- ⬜ Unchecked: literal mouse clicks in a real browser on the queue dropdown
-  (Gradio's Svelte dropdown ignores scripted/headless clicks — the handlers
-  behind it are verified via the Gradio API and unit tests; it needs a human
-  hand for the click, see `scripts/verification_checklist.md` ☐ items);
-  sung-lyrics pronunciation quality (ACE-Step controls vocals; no per-phrase
-  control); long-running soak of the share URL; CI results after this push.
+The evidence file also retains an explicitly dated October 19 LLM token-budget investigation. It is historical evidence, not a newly reproduced failure. The client retries empty text responses with a larger bounded token budget, and unit tests cover that behavior.
 
-> **Team verification:** the step-by-step grader dress-rehearsal lives in
-> [scripts/verification_checklist.md](scripts/verification_checklist.md).
-> Run it on a fresh ZIP deploy and move these bullets to ✅.
+**Deployment checks:** a GitHub ZIP was extracted separately, dependencies installed in a fresh virtual environment, and the app booted with three bundled samples. See the [rubric audit](docs/rubric-audit.md) for scope and remaining team requirements.
+
+**Fixes from review:** selected queue order is preserved; new songs immediately update the library table; blank storage settings use `data/`; waveform peaks use signed samples and cue markers use actual show duration. Skip controls now target Gradio's active player inside its shadow DOM instead of an unused audio element. The placeholder key and reserved agent port are rejected before requests.
+
+**Still unchecked:** a full browser listening pass, sung pronunciation, perceived voice-clone similarity, a separate WAV upload pass, long-duration reliability, and a teammate's independent installation. Automated decoding and API success do not prove those items. The final Next-button browser check moved the active player and visible time to the expected cue. A complete Previous-button recheck was interrupted when the browser tab became unavailable; full playback listening remains a team check.
+
+## Design judgment
+
+The show is mixed into **one continuous WAV** instead of starting separate speech and song players. The live test produced four sequential segments over 44.1 seconds, with 0.35-second gaps and no simultaneous segments. This makes automatic sequencing a property of the audio file. The tradeoff is WAV storage (about 10.6 MB per minute for 44.1 kHz, stereo, 16-bit audio) and having to rebuild the show after changing the queue.
+
+The light Boulder-inspired palette uses a warm background, terracotta accents and dark text. Numbered sections separate creation, show building and library management. These are design choices; user preference and accessibility beyond the checks described here have not been formally measured.
+
+The historical empty-response investigation showed that a successful HTTP response could still contain no lyrics. The practical lesson was to check the returned content and retry within a limit, rather than treating a successful request as a finished feature.
+
+## Known limitations
+
+- Class-service load can cause timeouts. ACE-Step polling has a seven-minute deadline, and generation may be retried after an error.
+- A failed cover request preserves the audio and reports a warning. There is no cover-only retry button; generating again retries the full flow.
+- Voice and musical qualities depend on the models; input settings do not guarantee exact output.
+- The public link is temporary and depends on the host process.
+- The app is a shared class demo: public visitors use the same library and can modify it. It has no separate user accounts.
+
+## Submission and team verification
+
+Submit the shared repository URL, the exact commit ID and a ZIP **downloaded from GitHub for that same commit**. Have a teammate extract it, follow these instructions with only class credentials, and test all three core features. Keep the repository accessible through grading.
+
+Use the [team checklist](scripts/verification_checklist.md) to record what was actually completed. At the initial audit there were no GitHub issues or pull requests; two contributor accounts do not prove that every teammate contributed or reviewed a teammate. The team must document that work and explain its findings in its own words. The original build prompt/Hermes conversation was not available for this review.
+
+For a local packaging check, `python scripts/make_zip.py` builds `dist/ai-jukebox-submission.zip` and `python scripts/make_zip.py --check` audits excluded runtime paths. This development archive does not replace the required GitHub download.
 
 ## Decision Judgement
 
 **Jaxon:**
 
 > My first jazz song was honestly a banger. It was something I'd actually listen to, which made me want to keep trying different genres and moods to see what else I could make. Having its own cover art and a DJ introduce it made it even cooler. That first song was what got me excited about the project.
-
-## Design judgment
-
-**One important design choice:** the jukebox show is **pre-mixed into one
-continuous audio file** (miniaudio decodes every segment to 44.1 kHz stereo
-16-bit PCM, gaps are inserted, stdlib `wave` writes one WAV) instead of
-queueing separate audio components in the UI with a playback-chain script.
-
-**Why and evidence:** chaining `<audio>` components in Gradio needs browser-side
-playback tracking and risks overlap or dead air between segments — exactly what
-the requirement forbids. Mixing makes the ordering a property of the file: the
-E2E run produced a 43.2 s mix whose cue times (0.0, 10.35, 22.70, 33.25 s)
-match the constituent intro/song durations plus 0.35 s gaps to within 0.1 s —
-sequential, gapless, no overlap, by construction. The player then gives free
-play/pause/skip and the cue sheet tells the listener where each segment starts.
-Costs: a WAV file per show (~5 MB/min) and no per-segment hot-swap, both
-acceptable for a class-sized library.
-
-**Visual theme (design choice):** the UI is a **Flatirons Boulder theme** —
-warm paper background (`#f5f1e8`), white cards, terracotta red-rock
-(`#a6503c`) primary buttons/sliders/accents, sand borders, sky-blue links,
-and dark warm text. Chosen over an earlier black & gold Spotify-style dark
-theme because dark-on-dark styling hurt readability; the light, earthy
-palette is high-contrast and easy on the eyes while still evoking Boulder
-(Front Range rock, sand, sky). Layout hierarchy is deliberate: a large bold
-**hero header**, numbered **section banners** (badge + big title + one-line
-description), controls grouped into titled cards ("Identity & style" /
-"Sound & meter" / "Setlist & voice"), and the primary action (**Generate**,
-**Build the show**) rendered larger than secondary buttons. Section headings
-get a terracotta accent; buttons are pill-shaped; one screen, three sections.
-
-**A limitation investigated:** the empty-LLM-reply failure (case B above). We
-assumed disabling thinking would bound reply length; live testing showed the
-reasoning pass consumes tokens regardless, so requests with modest budgets
-silently returned `content: null`. **Lesson:** trust the vendor schema less than
-a live probe — instrument real requests (finish_reason, reasoning_tokens) and
-make the client degrade gracefully (retry with a larger budget) instead of
-failing hard on a model quirk.
-
-## Layout
-
-```
-run.sh / run.bat       one-command launcher (venv + deps + start)
-app.py                 Gradio UI (single screen: Create / Queue / Library)
-ai_jukebox/
-  config.py            env-driven config (host, ports, models, key)
-  http.py              auth'd HTTP helpers (stdlib only)
-  llm.py               9001 chat + lyrics/cover/DJ prompt writers (+retry)
-  image.py             9006 FLUX cover art
-  music.py             9007 ACE-Step async generation
-  tts.py               9008 Chatterbox speech (+voice cloning)
-  dj.py                show builder: script + spoken intros
-  media.py             mixes a show into one continuous WAV (no ffmpeg)
-  library.py           on-disk song library + bundled-sample seeding
-  pipeline.py          orchestration for one full track
-scripts/
-  generate_samples.py  regenerates the 3 bundled samples (class endpoints)
-  e2e_evidence.py      live end-to-end evidence run (writes evidence_output.json)
-  make_zip.py          builds the submission ZIP (+ --check safeguard audit)
-  verification_checklist.md  team's grader-dress-rehearsal checklist
-tests/                 unit tests with mocked services (53)
-docs/screenshots/      UI screenshots used in this report
-samples/               bundled pre-generated sample tracks (committed)
-```
-
-## Compliance
-
-- No paid services anywhere (core or optional) — class services and the class
-  key alone.
-- No third-party music, lyrics, cover art, or voice samples are bundled; every
-  asset (including the samples) is generated live by the class services, and
-  sample lyrics are AI-written.
-- User uploads/recordings are never part of this repo — they land in `data/`
-  (gitignored); keep them out of commits and submission archives too.
-- No credential material in any committed file: `AIJ_API_KEY` is set per
-  developer in `.env` (placeholders only in `.env.example` and this README).

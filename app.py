@@ -77,7 +77,7 @@ def _library_gallery_items():
 
 
 def _df_update() -> gr.Dataframe:
-    return gr.Dataframe(value=_library_rows(), headers=LIBRARY_HEADERS, type="array")
+    return gr.Dataframe(value=_library_rows(), headers=LIBRARY_HEADERS, type="array", interactive=False)
 
 
 def _dropdown_update() -> gr.Dropdown:
@@ -183,7 +183,7 @@ def create_song(title, genre_choice, genre_custom, mood_multi, mood_custom,
     lines.append("\n_Track added to the library — queue it in section 2._")
     return (song.audio_path, song.cover_path, "\n".join(lines),
             _picker_update(value=library.prune_ids(queue)),
-            _gallery_update(), _dropdown_update(), _dropdown_update())
+            _gallery_update(), _dropdown_update(), _dropdown_update(), _df_update())
 
 
 # -------------------------------------------------------- section 2: queue + DJ
@@ -297,7 +297,15 @@ def rename_song(song_id, new_title, queue):
 # Client-side skip buttons: seek the continuous-mix player to the previous /
 # next cue time. The cue list rides in data-cues on the panel div, so the JS
 # needs no backend round-trip. (Native player seek still works as always.)
-_SKIP_JS = ("var a=document.querySelector('#show-player audio');"
+_SKIP_JS = ("function activeAudio(root){if(!root)return null;"
+            "var audios=root.querySelectorAll('audio');"
+            "for(var j=0;j<audios.length;j++){"
+            "if(audios[j].currentSrc||audios[j].getAttribute('src'))return audios[j]}"
+            "var nodes=root.querySelectorAll('*');"
+            "for(var j=0;j<nodes.length;j++){if(nodes[j].shadowRoot){"
+            "var found=activeAudio(nodes[j].shadowRoot);if(found)return found}}"
+            "return null}"
+            "var a=activeAudio(document.getElementById('show-player'));"
             "var box=document.getElementById('jukebox-controls');"
             "if(!a||!box)return;"
             "var cs=(box.getAttribute('data-cues')||'').split(',').map(parseFloat)"
@@ -305,7 +313,7 @@ _SKIP_JS = ("var a=document.querySelector('#show-player audio');"
             "var t=a.currentTime||0,n=-1,i;"
             "if(d>0){for(i=0;i<cs.length;i++){if(cs[i]>t+0.6){n=i;break}}}"
             "else{for(i=cs.length-1;i>=0;i--){if(cs[i]<t-1.0){n=i;break}}}"
-            "if(n>=0){a.currentTime=cs[n];if(a.paused)a.play()}")
+            "if(n>=0){a.currentTime=cs[n];if(a.paused)a.play().catch(function(){})}")
 
 _BTN_TPL = (
     '<button onclick="(function(d){__SKIP__})(%d)" '
@@ -322,7 +330,7 @@ def _viz_html(mix_path, markers):
             "<div id='jukebox-controls' data-cues=''>"
             "<div style='color:#8a8172;font-size:13px;padding:8px 2px'>"
             "🎼 Build a show to see its mix waveform — the ⏮ Prev / ⏭ Next "
-            "buttons skip between tracks (or drag the player's seek bar)."
+            "buttons skip between DJ intros and songs (or drag the seek bar)."
             "</div></div>"
         )
     cues = ",".join(f"{t:.2f}" for t, _ in markers)
@@ -454,14 +462,13 @@ button.primary:hover { transform: translateY(-1px); }
 def _hero_html() -> str:
     chip = ""
     if _seeded:
-        chip = "<span class='jk-hero-chip'>▶ 3 sample tracks preloaded — play instantly</span>"
+        chip = f"<span class='jk-hero-chip'>▶ {_seeded} sample tracks loaded — select them in the queue</span>"
     return (
         "<div class='jk-hero'>"
         "<div class='jk-hero-title'>🏔️ AI Jukebox <span class='city'>· Boulder, Colorado</span></div>"
         "<div class='jk-hero-sub'>A Flatirons-inspired jukebox — rock, sand &amp; sky on one "
-        "screen. Songs by ACE-Step (9007), covers by FLUX (9006), lyrics &amp; DJ scripts by "
-        "Qwen (9001), DJ voice by Chatterbox (9008). Port 9000 is never used. "
-        "Press 🎲 <b>Surprise me</b> and let the booth decide.</div>"
+        "screen. Create a song, build your DJ set, and keep your favorites in the library. "
+        "Press 🎲 <b>Surprise me</b> for random song settings.</div>"
         + chip + "</div>"
     )
 
@@ -486,7 +493,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
             gr.Markdown("<div class='jk-group-cap'>Identity &amp; style</div>")
             title_box = gr.Textbox(label="Title", placeholder="Neon Afterglow")
             genre_choice = gr.Dropdown(label="Genre / style", choices=GENRES,
-                                       value="upbeat indie pop", allow_custom_value=True)
+                                       value="upbeat indie pop")
             genre_custom = gr.Textbox(label="Custom genre…",
                                       placeholder="e.g. dreamy synthwave ballad",
                                       visible=False)
@@ -494,7 +501,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
                                      multiselect=True, value=["hopeful"])
             mood_custom = gr.Textbox(label="…or your own mood",
                                      placeholder="late-night drive through the city")
-            vocal_style = gr.Dropdown(label="Vocals style (vocal tracks)",
+            vocal_style = gr.Dropdown(label="Vocal style (vocal tracks)",
                                       choices=VOCAL_STYLES, value="Auto")
         with gr.Group():
             gr.Markdown("<div class='jk-group-cap'>Sound &amp; meter</div>")
@@ -503,18 +510,18 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
             duration_slider = gr.Slider(8, 60, value=20, step=2,
                                         label="Track length (seconds)")
             energy_slider = gr.Slider(1, 10, value=5, step=1,
-                                      label="Energy (1 = whisper, 10 = fever)")
+                                      label="Energy (1 = calm, 10 = intense)")
             bpm_slider = gr.Slider(0, 220, value=0, step=2, label="Tempo (BPM, 0 = auto)")
             key_choice = gr.Dropdown(label="Key", choices=KEYS, value="Auto")
             tsig_choice = gr.Dropdown(label="Time signature", choices=TIME_SIGNATURES,
                                       value="Auto")
+            thinking_box = gr.Checkbox(label="Music planning (may take longer)", value=False)
     with gr.Row():
         create_btn = gr.Button("🎬 Generate song + cover", variant="primary", scale=3)
         surprise_btn = gr.Button("🎲 Surprise me", scale=1, elem_classes=["jk-surprise"])
     with gr.Accordion("Custom lyrics (optional — vocal tracks; blank = AI-written)",
                       open=False):
         lyrics_box = gr.Textbox(lines=5, placeholder="[Verse 1]\n…", label="")
-        thinking_box = gr.Checkbox(label="LM planning (slower, richer)", value=False)
     with gr.Row():
         song_audio = gr.Audio(label="Your song", type="filepath")
         cover_img = gr.Image(label="Cover art", type="filepath", height=300)
@@ -549,7 +556,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
     library_gallery = gr.Gallery(label="All tracks", columns=3, height=220,
                                  value=_library_gallery_items())
     library_table = gr.Dataframe(headers=LIBRARY_HEADERS, type="array",
-                                 value=_library_rows())
+                                 value=_library_rows(), interactive=False)
     with gr.Row():
         rename_picker = gr.Dropdown(label="Rename a track", choices=_song_choices())
         rename_box = gr.Textbox(label="New title", placeholder="What should we call it?")
@@ -577,7 +584,7 @@ with gr.Blocks(title="AI Jukebox · Boulder", theme=theme, css=_UI_CSS) as demo:
                 vocal_radio, vocal_style, energy_slider, bpm_slider, key_choice,
                 tsig_choice, lyrics_box, duration_slider, thinking_box, show_picker],
         outputs=[song_audio, cover_img, create_report, show_picker,
-                 library_gallery, delete_picker, rename_picker],
+                 library_gallery, delete_picker, rename_picker, library_table],
     )
 
     build_btn.click(

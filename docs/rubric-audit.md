@@ -1,43 +1,55 @@
 # Assignment 3 rubric audit - November 1, 2026
 
-Reviewed against all three pages of the supplied Assignment 3 PDF and the supplied class-endpoints (2).txt (updated September 30, 2026). This is an agent verification report, not a substitute for the team's own explanation or teammate testing.
+Reviewed against all three pages of the supplied Assignment 3 PDF and the supplied class endpoint file. This is an agent review; it does not substitute for the team's explanation or a teammate's independent test.
 
-## Findings
+## Required class services
 
-The required AI features use only the class services. The runtime key matches the supplied endpoint file; no key is reproduced here. No app request uses port 9000. No paid AI service or external API key is needed.
+The configured key matches the supplied file. It is not included in this report.
 
-| Feature | Actual destination | Model | Result |
-| --- | --- | --- | --- |
-| Lyrics, cover prompts, DJ scripts | http://dobolyi.com:9001/v1/chat/completions | cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit | Live generation passed |
-| Cover art | http://dobolyi.com:9006/v1/images/generations | black-forest-labs/FLUX.2-klein-4B | Two new PNG covers generated |
-| Music | http://dobolyi.com:9007/release_task, /query_result, audio download | Server reported acestep-v15-xl-turbo | Vocal and instrumental MP3s decoded |
-| DJ speech and reference audio | http://dobolyi.com:9008/v1/audio/speech | chatterbox-v3 | Default and MP3-reference requests passed |
+| Purpose | Class destination | Model |
+| --- | --- | --- |
+| Lyrics, artwork prompts, DJ scripts | http://dobolyi.com:9001/v1/chat/completions | cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit |
+| Cover art | http://dobolyi.com:9006/v1/images/generations | black-forest-labs/FLUX.2-klein-4B |
+| Music | http://dobolyi.com:9007/release_task and /query_result | ACE-Step/acestep-v15-xl-turbo |
+| DJ voice/reference audio | http://dobolyi.com:9008/v1/audio/speech | chatterbox-v3 |
 
-## Requirement-by-requirement review
+Live requests passed for all four services. No paid AI service is used. Port 9000 is rejected by the URL builder.
 
-| Requirement | Evidence / status |
+## Rubric findings
+
+| Requirement | Finding |
 | --- | --- |
-| Style, mood, duration, vocal/instrumental controls | Present in the UI. Golden Hour: chillhop, warm sunset/easygoing, 12 seconds, vocal. Empty Streets: ambient, quiet rainfall, 10 seconds, instrumental. |
-| AI-generated vocal lyrics and playable music | 101 words from Qwen; 192,812-byte vocal MP3; decoded duration exactly 12 seconds. Instrumental has no lyrics and decodes to 10 seconds. Both were saved in an isolated library. |
-| A new matching FLUX cover per song | Both generated songs have valid PNG files; Golden Hour is 1024 x 1024. Prompts are derived from each song's title, genre, mood and lyrics. Human review of artistic fit remains unchecked. |
-| Song-specific commentary, default voice | Two Qwen/Chatterbox intros, 157,484 and 144,812 bytes, in a four-segment show. |
-| MP3/WAV reference support | UI accepts both formats. Live base64 MP3 reference produced a 195,116-byte intro with 43 words. Distinct WAV upload and perceptual voice similarity were not retested. No personal voice recording was used. |
-| Sequential playback, auto-advance, no overlap | Mixer creates one continuous WAV, decoded duration 41.77 seconds. Cue times: 0.00 / 10.11 / 22.46 / 31.77 seconds, with 0.35-second gaps. Native play/pause and cue skip controls exist. Full browser listening and skip checks remain human checks. |
-| Selected and shuffled queue order | Found a real bug: UI builder sorted by library recency instead of selected order. Fixed selection ordering. Regression test exercises both orders and ignores a stale ID. |
-| Three bundled sample songs with titles/covers | Neon Afterglow and Morning Gold record AUTO_LYRICS; Midnight Cafe records INSTRUMENTAL. All three MP3s and covers exist in GitHub and seed a clean library. Generation script uses the same class pipeline. Historical asset provenance is recorded by metadata/script, not independently reconstructed. |
-| Generation status and understandable, recoverable errors | Stage progress is wired to generation. Wrong key produced HTTP 401 with a readable invalid-key error. Restoring the correct key produced a 24,236-byte speech response. UI error wrappers and failure behavior covered in tests; browser error interaction not repeated. |
-| Credentials server-side; no uploads in submission | Supplied credentials absent from tracked files, reachable Git history, and served browser configuration. No tracked data/ or samples/_stage/ files. .env is ignored and example configuration has placeholders. |
-| README setup, screenshots, test evidence, design judgment | Present. Fresh evidence refreshed in scripts/evidence_output.json. README explains the continuous-mix choice and historical empty-LLM-response investigation. Port-conflict instructions corrected. |
-| Independent installation from GitHub ZIP | Downloaded GitHub ZIP for 4271e0175ea87f4d933df06864873af634336e98, extracted separately, created a fresh venv and installed only requirements.txt. App booted on a free port and seeded three sample songs. This is agent testing on this Mac, not the required teammate run. |
-| GitHub repository + exact commit + GitHub ZIP | Submit the reviewed final commit and a GitHub-generated ZIP for that exact commit. The locally produced make_zip.py archive is a development check; it does not replace the specifically required GitHub ZIP. |
-| Issues, pull requests, teammate contributions/reviews | At inspection there were no GitHub issues or PRs. GitHub showed two contributors, which does not establish that every teammate contributed meaningfully or reviewed a teammate. Team must complete/document this itself. |
-| Retained starter prompt / Hermes workflow | The original build conversation and team prompt edits were not provided; this process requirement cannot be verified from the running app. |
+| Custom vocal and instrumental songs | Genre, mood, duration and vocal controls are wired to the pipeline. Fresh real MP3s were decoded and checked against requested 12- and 10-second durations. Vocal lyrics came from Qwen; instrumental lyrics were empty. |
+| New matching FLUX cover per song | Both new songs received valid 1024 x 1024 PNGs. Artwork prompts use the song's theme and mood. Artistic relevance remains a human judgment. |
+| Integrated DJ, default and reference voice | Real Qwen scripts and Chatterbox audio were mixed between songs. The MP3 reference request produced a decoded speech file. Perceived voice similarity and a distinct WAV upload remain unchecked. |
+| Queue sequencing and controls | A single WAV contains intro/song/intro/song with short gaps and no overlapping segments. Selected order is preserved. The final browser skip check is recorded below. |
+| Three sample songs with titles and covers | All audio files and covers are present. Two samples record AUTO_LYRICS; the third is instrumental. The generation script uses the class pipeline; historical provenance was not independently reconstructed. |
+| New tracks remain playable in the session | Local JSON-indexed library persists generated assets. Gallery, queue and table update after generation. |
+| Status, errors and recovery | Stage progress and error wrappers exist. Live invalid-key requests returned 401; restoring a correct key succeeded in the earlier same-day recovery check. |
+| Credentials and uploads excluded | No tracked runtime library or reference recordings. Supplied key values absent from tracked files and browser configuration at the initial scan. Final archive is scanned again before delivery. |
+| Setup, screenshots, test evidence, design judgment | README now uses actual section names and measured evidence, with older screenshots labeled as such. Design discussion explains the continuous-mix tradeoff. The historical token-budget failure is identified as historical. |
+| Independent ZIP deployment | Initial and subsequent GitHub ZIPs booted from extracted source. Dependencies were installed in a fresh virtual environment on this Mac. A teammate still needs to repeat the installation independently. |
+| Exact repository, commit and matching GitHub ZIP | Final handoff supplies the repository commit and an archive downloaded from GitHub for that commit. |
+| Meaningful teammate contributions and reviews | Two contributor accounts were observed; no issues or PRs existed at the initial audit. That does not establish every teammate's contribution or review. Team must complete/document it. |
+| Retained starter prompt/Hermes build record | Original build conversation and prompt edits were unavailable; this requirement cannot be certified from the app. |
 
-## Validation and practical limits
+## Verified fixes
 
-- 54 unit tests pass, including the new UI queue-order regression.
-- Fresh live service results are in `scripts/evidence_output.json`. The LLM token-budget row explicitly describes a historical October 19 observation; it is not a newly reproduced failure.
-- Real generated MP3s and the mixed WAV were decoded; validity is not inferred only from filename or response size.
-- The live URL is temporary. It expires after about one week and depends on the host Mac and app process remaining available. A working GitHub ZIP is the grading requirement; the share URL is a convenience.
-- A failed FLUX request saves the song with a warning and no cover. There is no dedicated cover-only retry; rerunning generation retries the full flow. Service load can still cause request timeouts.
-- The team should listen to a two-track show, check play/pause/Next/Prev and voice similarity, review cover relevance, and have a teammate deploy the final GitHub ZIP before submission. Team explanations and peer review cannot be certified by an agent.
+- Preserved selected queue order rather than library recency.
+- Updated the library table immediately after generation.
+- Fixed empty AIJ_DATA_DIR so generated files stay under the gitignored data directory.
+- Fixed waveform amplitude calculations and scaled cue markers to the actual show duration; escaped track labels for valid SVG.
+- Fixed skip-button targeting: Gradio's unused light-DOM audio element was being selected instead of the active player in its shadow DOM.
+- Rejected the example credential placeholder and reserved agent port before requests.
+- Clarified labels and planning behavior, removed duplicated genre-entry paths, and removed stale or unsupported README claims.
+- Strengthened the live evidence runner so missing audio, missing covers, wrong duration or accepted bad credentials fail assertions rather than being marked PASS.
+
+59 unit tests pass. The live evidence runner also completed successfully with its new assertions; measured results are in scripts/evidence_output.json and summarized in README.md.
+
+## Remaining limits
+
+A human should judge the music, pronunciation, artwork relevance and cloned voice, test a WAV reference, and perform the required teammate installation and peer review. Long-duration availability and Windows launch were not retested. Public visitors share one library. Share links are temporary and require the host to stay running.
+
+## Final browser check
+
+A two-track default-voice show was built through the live UI. With cues 0.00 / 12.23 / 28.58 / 39.49 seconds, clicking Next changed the visible player from 0:03 to 0:12; the active audio element reported 12.59 seconds and a 55.49-second duration. This confirms the fixed handler targeted the actual player. A full Previous-button recheck was interrupted when the browser tab became unavailable. Full listening, voice similarity and teammate checks remain unchecked.

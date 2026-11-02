@@ -23,3 +23,17 @@ def test_show_uses_selected_order_not_library_recency(monkeypatch, isolated_data
     app.build_show(["old", "missing", "new"], None)
     app.build_show(["new", "old"], None)
     assert seen == [["old", "new"], ["new", "old"]]
+
+
+def test_generated_song_immediately_updates_library_table(monkeypatch, isolated_data_dir):
+    import app
+    lib = Library(isolated_data_dir)
+    song = Song(id='fresh', title='Fresh Jazz', genre='jazz', mood='warm',
+                created=1, audio_path='song.mp3')
+    lib.add(song)
+    monkeypatch.setattr(app, 'library', lib)
+    monkeypatch.setattr(app.pipeline, 'generate_song', lambda *a, **k: (song, []))
+    outputs = app.create_song('Fresh Jazz', 'jazz', '', [], 'warm', 'Instrumental',
+                              'Auto', 5, 0, 'Auto', 'Auto', '', 12, False, [])
+    assert len(outputs) == 8
+    assert outputs[-1].value['data'][0][0] == 'Fresh Jazz'

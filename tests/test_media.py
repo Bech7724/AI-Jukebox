@@ -45,8 +45,8 @@ def test_mix_show_requires_segments(tmp_path):
         media.mix_show([], str(tmp_path / "x.wav"))
 
 
-def test_mix_show_decodes_mp3_and_wav_together(tmp_path):
-    """Mixed-format inputs (TTS mp3 + music wav) must decode to one stream."""
+def test_mix_show_reuses_wav_segments(tmp_path):
+    """Repeated WAV inputs must decode to one stream."""
     wav = _write_wav(str(tmp_path / "tone.wav"), 0.1)
     out = str(tmp_path / "mix2.wav")
     media.mix_show([wav, wav], out)
@@ -83,3 +83,22 @@ def test_waveform_svg_emits_mirrored_wave_and_markers(tmp_path):
 
 def test_waveform_svg_handles_garbage_path():
     assert media.waveform_svg("/nonexistent/definitely-not-here.mp3") in ("", "<svg></svg>")
+
+
+def test_waveform_uses_signed_samples_and_whole_file(tmp_path):
+    import struct
+    path = tmp_path / 'levels.wav'
+    with wave.open(str(path), 'wb') as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(RATE)
+        w.writeframes(struct.pack('<h', 0) * 4410 + struct.pack('<h', -16384) * 4410)
+    peaks = media._mono_peaks(str(path), buckets=2)
+    assert peaks == pytest.approx([0.0, 0.5])
+    svg = media.waveform_svg(str(path), width=320, markers=[(0.1, 'Jazz & <Soul>')])
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(svg)
+    ns = {'s': 'http://www.w3.org/2000/svg'}
+    line = root.find('s:line', ns)
+    assert float(line.attrib['x1']) == pytest.approx(160)
+    assert root.find('s:text', ns).text == 'Jazz & <Soul>'

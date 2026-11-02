@@ -25,7 +25,7 @@ OUTPUT = ROOT / "dist" / "ai-jukebox-submission.zip"
 # Same spirit as .gitignore: anything that could carry credentials or
 # user-uploaded data must never enter the archive.
 EXCLUDE_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", "data",
-                "samples", "dist", ".hermes"}
+                "samples", "dist", ".hermes", ".gradio"}
 EXCLUDE_FILES = {".env", "share_url.txt"}
 EXCLUDE_SUFFIXES = (".pyc", ".pyo", ".zip", ".DS_Store")
 # samples/ is re-included explicitly below (it is committed and required).

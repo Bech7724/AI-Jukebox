@@ -27,16 +27,16 @@ TTS_PORT = os.environ.get("AIJ_TTS_PORT", "9008")        # Chatterbox Multilingu
 # Model identifiers served by those ports
 LLM_MODEL = os.environ.get("AIJ_LLM_MODEL", "cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit")
 IMAGE_MODEL = os.environ.get("AIJ_IMAGE_MODEL", "black-forest-labs/FLUX.2-klein-4B")
-MUSIC_MODEL = os.environ.get("AIJ_MUSIC_MODEL", "acestep-v15-xl-turbo")  # None -> server default
 TTS_MODEL = os.environ.get("AIJ_TTS_MODEL", "chatterbox-v3")
 
 # Local artifact storage (generated music, cover art, DJ audio, index)
-DATA_DIR = os.environ.get(
-    "AIJ_DATA_DIR",
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"),
+DATA_DIR = os.environ.get("AIJ_DATA_DIR", "").strip() or os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
 )
 
 
 def base_url(port: str) -> str:
     """http://<host>:<port> for a class service."""
+    if str(port).strip() == "9000":
+        raise ValueError("Port 9000 is reserved for Hermes; use the class app service ports.")
     return f"{BASE_HOST}:{port}"

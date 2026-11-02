@@ -17,6 +17,7 @@ import sys
 import tempfile
 import time
 import wave
+import miniaudio
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -48,6 +49,9 @@ def main() -> None:
              "mood": "warm sunset, easygoing", "duration": 12, "vocal": True}
     t0 = time.time()
     song1, steps1 = pipeline.generate_song(lib, **spec1)
+    assert song1.lyrics.strip() and lib.get(song1.id), "Vocal track/lyrics missing"
+    decoded = miniaudio.decode_file(song1.audio_path)
+    assert abs(decoded.num_frames / decoded.sample_rate - spec1["duration"]) < 1
     s1 = next(s for s in steps1 if s.name == "music")
     evidence["f1_vocal"] = {
         "input": spec1,
@@ -68,6 +72,9 @@ def main() -> None:
     spec2 = {"title": "Empty Streets", "genre": "ambient",
              "mood": "quiet rainfall", "duration": 10, "vocal": False}
     song2, steps2 = pipeline.generate_song(lib, **spec2)
+    assert song2.lyrics == "" and not song2.vocal and lib.get(song2.id)
+    decoded = miniaudio.decode_file(song2.audio_path)
+    assert abs(decoded.num_frames / decoded.sample_rate - spec2["duration"]) < 1
     evidence["f1_instrumental"] = {
         "input": spec2,
         "expected": "no lyrics sent (instrumental)",
@@ -80,6 +87,8 @@ def main() -> None:
     cover_px = None
     if song1.cover_path and Path(song1.cover_path).exists():
         cover_px = png_size(song1.cover_path)
+    assert cover_px == (1024, 1024), "Vocal cover missing or wrong size"
+    assert song2.cover_path and png_size(song2.cover_path) == (1024, 1024)
     evidence["f2_cover"] = {
         "input": {"track": song1.title, "prompt_source": "LLM cover prompt (100% FLUX)"},
         "expected": "new FLUX cover per track, displayed with the track",
@@ -97,6 +106,9 @@ def main() -> None:
     intro_files = [s["audio"] for s in segments if s["kind"] == "intro"]
     show_wav = tmp_dir / "show-default.wav"
     mixed, starts = media.mix_show([s["audio"] for s in segments], str(show_wav))
+    assert [s["kind"] for s in segments] == ["intro", "song", "intro", "song"]
+    assert len(starts) == 4 and all(a < b for a, b in zip(starts, starts[1:]))
+    assert wav_duration(mixed) > spec1["duration"] + spec2["duration"]
     evidence["f3_dj_default"] = {
         "input": {"tracks": [song1.title, song2.title], "voice": "default (no upload)"},
         "expected": "Qwen commentary spoken by Chatterbox between songs; one continuous mix",
@@ -113,6 +125,7 @@ def main() -> None:
     # ---- Feature 3b: DJ voice cloning (upload-style ref audio) -----------
     ref = base64.b64encode(Path(intro_files[0]).read_bytes()).decode()
     script, clone_path = dj.make_intro(lib, None, song1, voice_ref_b64=ref)
+    assert script.strip() and miniaudio.decode_file(str(clone_path)).num_frames > 0
     evidence["f3_dj_cloned_voice"] = {
         "input": {"voice": "cloned from a base64 MP3 reference (as the UI upload does)"},
         "expected": "intro generated in the cloned voice, saved as MP3",
@@ -131,6 +144,7 @@ def main() -> None:
             tts.synthesize("should fail")
             evidence["fail_auth"] = {"input": "bad API key", "expected": "clear error",
                                      "actual": "NO ERROR (unexpected)", "status": "FAIL"}
+            raise AssertionError("Invalid credentials unexpectedly accepted")
         finally:
             config.API_KEY = saved_key
     except http.ServiceError as e:
