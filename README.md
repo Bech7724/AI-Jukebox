@@ -4,7 +4,7 @@ Create vocal or instrumental songs with matching cover art, then arrange them in
 
 ## Live demo
 
-[Open AI Jukebox](https://ac393470219442d944.gradio.live/)
+[Open AI Jukebox](https://482ae440254f0a25d8.gradio.live/)
 
 This temporary Gradio link requires the host Mac to stay awake and the app process to keep running. It expires after about one week. Restart with `AIJ_SHARE=1 python app.py` and update this link when needed. The downloadable app is the version to submit for independent testing.
 
@@ -104,7 +104,7 @@ The evidence file also retains an explicitly dated October 19 LLM token-budget i
 
 The show is mixed into **one continuous WAV** instead of starting separate speech and song players. The live test produced four sequential segments over 44.1 seconds, with 0.35-second gaps and no simultaneous segments. This makes automatic sequencing a property of the audio file. The tradeoff is WAV storage (about 10.6 MB per minute for 44.1 kHz, stereo, 16-bit audio) and having to rebuild the show after changing the queue.
 
-The light Boulder-inspired palette uses a warm background, terracotta accents and dark text. Numbered sections separate creation, show building and library management. These are design choices; user preference and accessibility beyond the checks described here have not been formally measured.
+The light Boulder-inspired palette uses a warm background, terracotta accents and dark text. The same palette is applied when the browser requests dark mode, and narrow screens stack the controls. Numbered sections separate creation, show building and library management. These are design choices; user preference and accessibility beyond the checks described here have not been formally measured.
 
 The historical empty-response investigation showed that a successful HTTP response could still contain no lyrics. The practical lesson was to check the returned content and retry within a limit, rather than treating a successful request as a finished feature.
 

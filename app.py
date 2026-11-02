@@ -340,7 +340,7 @@ def _viz_html(mix_path, markers):
     return (
         f"<div id='jukebox-controls' data-cues='{cues}'>"
         f"<div style='display:flex;align-items:center;gap:16px'>"
-        f"<div style='flex:1;min-width:300px'>{svg}</div>"
+        f"<div style='flex:1;min-width:0'>{svg}</div>"
         f"<div style='display:flex;flex-direction:column;gap:8px'>{prev}{nxt}</div>"
         f"</div></div>"
     )
@@ -392,13 +392,42 @@ theme = gr.themes.Base(
     body_text_size="15px",
     input_text_size="15px",
     button_large_text_size="16px",
+    background_fill_secondary_dark=_PAPER,
+    block_border_color_dark=_SAND,
+    block_label_background_fill_dark=_PAPER,
+    block_label_text_color_dark=_MUTED,
+    block_title_text_color_dark=_INK,
+    body_text_color_dark=_INK,
+    input_background_fill_dark=_CARD,
+    input_border_color_dark=_SAND,
+    button_primary_background_fill_dark=_TERRA,
+    button_primary_background_fill_hover_dark=_TERRA_HOVER,
+    button_primary_text_color_dark="#ffffff",
+    button_primary_border_color_dark=_TERRA,
+    button_secondary_background_fill_dark=_CARD,
+    button_secondary_text_color_dark=_INK,
+    button_secondary_border_color_dark=_SAND,
+    border_color_primary_dark=_SAND,
+    border_color_accent_dark=_TERRA,
 )
 
 _UI_CSS = """
 /* Display type for the big headings (falls back to Inter if offline). */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;800&display=swap');
-.gradio-container { max-width: 1180px !important; margin: 0 auto !important;
+.gradio-container { width: 100% !important; min-width: 0 !important; box-sizing: border-box;
+  max-width: 1180px !important; margin: 0 auto !important;
   background: radial-gradient(1400px 560px at 50% -140px, #fdf7e9 0%, #f5f1e8 62%) !important; }
+.gradio-container .row, .gradio-container .row > *, .gradio-container .block {
+  min-width: 0 !important; max-width: 100%; box-sizing: border-box; }
+.gradio-container .row { flex-wrap: wrap !important; }
+.gradio-container .table-wrap { overflow-x: auto; max-width: 100%; }
+.jk-hero-title, .jk-hero-sub, .jk-section-title, .jk-section-desc {
+  overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .gradio-container .row > * { flex: 1 1 100% !important; width: 100% !important; }
+  .gradio-container { padding: 12px !important; }
+  .jk-hero-title { font-size: 26px !important; }
+}
 button { border-radius: 999px !important; }
 blockquote { border-left: 3px solid #a6503c !important; }
 footer { color: #7a7264 !important; }

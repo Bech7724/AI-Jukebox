@@ -53,3 +53,7 @@ A human should judge the music, pronunciation, artwork relevance and cloned voic
 ## Final browser check
 
 A two-track default-voice show was built through the live UI. With cues 0.00 / 12.23 / 28.58 / 39.49 seconds, clicking Next changed the visible player from 0:03 to 0:12; the active audio element reported 12.59 seconds and a 55.49-second duration. This confirms the fixed handler targeted the actual player. A full Previous-button recheck was interrupted when the browser tab became unavailable. Full listening, voice similarity and teammate checks remain unchecked.
+
+## Display cleanup
+
+Matched dark-theme colors to the light palette to keep labels readable, constrained the page width, and added stacked controls below 600 pixels. A browser check at a 644-pixel viewport measured a 644-pixel page with readable controls and no page overflow. The saved reviewed screenshot shows this view.
