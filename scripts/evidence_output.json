@@ -9,13 +9,13 @@
     },
     "expected": "playable MP3 in library, AI lyrics, metadata",
     "actual": {
-      "lyrics_words": 128,
+      "lyrics_words": 101,
       "audio_bytes": 192812,
       "mp3_magic": "ID3",
       "bpm": 88,
-      "key": "E major",
-      "music_seconds": 5.8,
-      "total_seconds": 74.6
+      "key": "C# minor",
+      "music_seconds": 5.9,
+      "total_seconds": 64.6
     },
     "status": "PASS"
   },
@@ -47,7 +47,7 @@
         1024,
         1024
       ],
-      "prompt": "Lo-fi chillhop aesthetic captures a serene car interior bathed in amber light streaming through open"
+      "prompt": "Lo-fi digital illustration featuring a tranquil urban street at twilight. Rich amber light washes ov"
     },
     "status": "PASS"
   },
@@ -62,18 +62,18 @@
     "expected": "Qwen commentary spoken by Chatterbox between songs; one continuous mix",
     "actual": {
       "intros": [
-        161324,
-        164396
+        157484,
+        144812
       ],
       "intro_mp3_magic": "ID3",
       "segments": 4,
       "cue_times": [
         0.0,
-        10.35,
-        22.7,
-        33.25
+        10.11,
+        22.46,
+        31.77
       ],
-      "mix_seconds": 43.2
+      "mix_seconds": 41.8
     },
     "status": "PASS"
   },
@@ -83,8 +83,8 @@
     },
     "expected": "intro generated in the cloned voice, saved as MP3",
     "actual": {
-      "script_words": 36,
-      "mp3_bytes": 171692,
+      "script_words": 43,
+      "mp3_bytes": 195116,
       "mp3_magic": "ID3"
     },
     "status": "PASS"

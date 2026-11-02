@@ -199,7 +199,7 @@ def build_show(selected_ids, voice_ref):
                 "⚠️ Pick at least one track, then press **Build the show**.",
                 _viz_html("", []))
     # Preserve the order in which the user selected tracks (the queue order).
-    order = {s.id: i for i, s in enumerate(songs)}
+    order = {song_id: i for i, song_id in enumerate(selected_ids or [])}
     songs.sort(key=lambda s: order[s.id])
 
     try:

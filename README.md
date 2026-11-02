@@ -9,13 +9,20 @@ for agentic use and is **never** used by this app.
 
 ## Live demo
 
-🔗 **https://f06514d2aa3ac0f900.gradio.live** — refreshed November 1, 2026; hosted on the local Mac.
+🔗 **https://f9b145b4eafa152fb6.gradio.live** — refreshed November 1, 2026; hosted on the local Mac.
 The Mac must remain awake and the app process must remain running.
 
 > Share links rotate: this public URL dies with the app process and expires
 > automatically (~1 week). When it stops working, refresh it by launching
 > `AIJ_SHARE=1 python app.py` on the host machine and replacing this URL with
 > the new `gradio.live` link. The local Setup and use below always works.
+
+## Rubric review - November 1, 2026
+
+See [the detailed rubric audit](docs/rubric-audit.md) for fresh class-service results,
+the queue-order fix, 54 passing tests, and the remaining teammate verification
+and review requirements. The historical October 19 results below are retained
+with their date; fresh measured values are in `scripts/evidence_output.json`.
 
 ## Features
 
@@ -115,12 +122,18 @@ bash run.sh                            # one command: creates .venv + .env.examp
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env                   # fill AIJ_API_KEY
-python app.py                          # http://127.0.0.1:7860 (Gradio picks the
-                                       # next free port if 7860 is busy)
+python app.py                          # http://127.0.0.1:7860
+# If 7860 is in use: AIJ_PORT=7861 python app.py
 # optional public link: AIJ_SHARE=1 python app.py
 ```
 
-**Submission archive:** `python scripts/make_zip.py` builds
+**Final submission:** supply the shared repository URL, the exact submitted
+commit ID, and a ZIP downloaded from GitHub for that same commit. Have a
+teammate extract it, follow this README, and test all three features with
+the class credentials. Record teammate contributions and reviews through
+GitHub issues and pull requests. See the audit above for unchecked items.
+
+**Development archive:** `python scripts/make_zip.py` builds
 `dist/ai-jukebox-submission.zip` (7.4 MB, deploy-from-ZIP ready) and
 `python scripts/make_zip.py --check` verifies it — asserting no `.env`,
 `data/`, or `samples/_stage/` content ever ships. `dist/` is gitignored.
