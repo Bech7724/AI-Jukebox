@@ -9,7 +9,8 @@ Agent checks and team checks are separate. Record the tester, date, inputs and a
 - [x] Generated audio decoded; two-track show is a single sequential mix.
 - [x] Wrong-key request rejected; correct-key retry succeeded.
 - [x] GitHub ZIP installed in a fresh virtual environment and seeded three sample songs.
-- [x] 59 unit tests pass, including queue order, library refresh, blank storage default and waveform timing/amplitude.
+- [x] 65 unit tests pass, including queue order, library refresh, blank storage default, waveform timing/amplitude, the live status and error cards, automatic titles, setlist auto-add and cover thumbnails.
+- [x] Redesigned UI live run (Nov 1): vocal song through Studio with live status and an AI title, instrumental, four-track show, MP3 and WAV voice references, fresh install of committed files (see README).
 
 The live API run is recorded in `scripts/evidence_output.json`; manual items below remain unchecked. The final Next-button browser check moved the visible player to its cue; the complete Previous-button recheck was interrupted when the tab became unavailable.
 
@@ -18,12 +19,12 @@ The live API run is recorded in `scripts/evidence_output.json`; manual items bel
 - [ ] Download the ZIP for the exact submitted GitHub commit and extract it into a new folder.
 - [ ] Follow only README.md and the supplied class credentials to install and launch it. Use a free AIJ_PORT if the default is occupied.
 - [ ] Confirm three sample titles, audio files and covers are included.
-- [ ] Generate a vocal song with chosen genre/mood/duration and AI lyrics; play it and inspect its cover.
-- [ ] Generate an instrumental; confirm it has no sung lyrics and that the library table, gallery and queue update.
+- [ ] In Studio, describe a song, pick mood chips, a style, Vocal and a length; generate it, watch the step-by-step status card, then play it and inspect its cover and AI lyrics.
+- [ ] Generate an instrumental; confirm it has no sung lyrics and that the latest-tracks grid, library, ticker and DJ setlist update.
 - [ ] Select two tracks in a deliberate order; build a default-voice show and hear DJ, song, DJ, song without overlap.
 - [ ] Check play/pause, seek bar and Prev/Next segment buttons. Rebuild after shuffling and confirm the new order.
 - [ ] Upload an MP3 reference, rebuild and judge voice similarity; repeat with a WAV reference.
-- [ ] Rename a track, refresh, and confirm the title persists. Delete only a disposable test track and confirm it is removed.
+- [ ] Under Library > Manage tracks, rename a track, refresh, and confirm the title persists. Delete only a disposable test track and confirm it is removed.
 - [ ] Check a failed request produces an understandable error and that retry works after correcting the cause.
 - [ ] Judge cover relevance, sung pronunciation and overall listening quality.
 
