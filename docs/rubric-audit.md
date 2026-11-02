@@ -1,6 +1,6 @@
 # Assignment 3 rubric audit - November 1, 2026
 
-Reviewed against all three pages of the supplied MBAX 6418 Assignment 3 PDF and the supplied class-endpoints (2).txt (updated September 30, 2026). This is an agent verification report, not a substitute for the team's own explanation or teammate testing.
+Reviewed against all three pages of the supplied Assignment 3 PDF and the supplied class-endpoints (2).txt (updated September 30, 2026). This is an agent verification report, not a substitute for the team's own explanation or teammate testing.
 
 ## Findings
 
