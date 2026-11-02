@@ -115,9 +115,9 @@ def waveform_svg(path: str, width: int = 640, height: int = 120,
         "<svg viewBox='0 0 %d %d' width='100%%' xmlns='http://www.w3.org/2000/svg'>"
         % (width, height),
         "<defs><linearGradient id='jkwave' x1='0' y1='0' x2='1' y2='0'>"
-        "<stop offset='0' stop-color='#a6503c'/>"
-        "<stop offset='0.5' stop-color='#c08a2d'/>"
-        "<stop offset='1' stop-color='#a6503c'/>"
+        "<stop offset='0' stop-color='#ff4f8b'/>"
+        "<stop offset='0.5' stop-color='#ffb547'/>"
+        "<stop offset='1' stop-color='#ff4f8b'/>"
         "</linearGradient></defs>",
         "<polyline points='%s' fill='none' stroke='url(#jkwave)' stroke-width='1.6' "
         "stroke-linejoin='round' opacity='0.95'/>" % top,
@@ -131,11 +131,11 @@ def waveform_svg(path: str, width: int = 640, height: int = 120,
             x = t_sec / duration * width if duration else 0
             x = min(max(x, 2.0), width - 2.0)
             parts.append(
-                "<line x1='%.1f' y1='4' x2='%.1f' y2='%d' stroke='#b8966a' "
+                "<line x1='%.1f' y1='4' x2='%.1f' y2='%d' stroke='#4fe3ff' stroke-opacity='0.6' "
                 "stroke-width='1' stroke-dasharray='3 3'/>" % (x, x, height - 4)
             )
             parts.append(
-                "<text x='%.1f' y='10' font-size='8' fill='#8a8172' "
+                "<text x='%.1f' y='10' font-size='8' fill='#a69fbc' "
                 "text-anchor='middle'>%s</text>" % (x, escape(label))
             )
     parts.append("</svg>")

@@ -85,3 +85,11 @@ def test_write_dj_script_mentions_both_tracks(fake_llm):
     llm.write_dj_script("Old Track", "pop", "New Track", "jazz")
     user_msg = fake_llm["payload"]["messages"][-1]["content"]
     assert "Old Track" in user_msg and "New Track" in user_msg
+
+
+def test_write_title_keeps_first_line_without_quotes(monkeypatch):
+    monkeypatch.setattr(
+        http, "post_json",
+        lambda *a, **k: {"choices": [{"message": {"content": '"Harbor Lights."\nextra'}}]},
+    )
+    assert llm.write_title("indie pop", "hopeful") == "Harbor Lights"

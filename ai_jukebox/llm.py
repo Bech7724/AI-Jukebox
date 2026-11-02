@@ -98,6 +98,18 @@ def write_cover_prompt(title: str, genre: str, mood: str, lyrics: str) -> str:
     )
 
 
+def write_title(genre: str, mood: str) -> str:
+    """Short song title (2-4 words) when the user leaves the title blank."""
+    user = (
+        f"Name a new song. Genre/style: {genre}\nMood/theme: {mood}\n"
+        "Reply with a 2-4 word title only: no quotes, no punctuation at the end, "
+        "no artist names or existing song titles."
+    )
+    title = chat([{"role": "user", "content": user}], max_tokens=1024, temperature=0.9)
+    title = title.splitlines()[0].strip().strip('"“”\'*').rstrip(".!")
+    return title[:60] or "Untitled Song"
+
+
 def write_dj_script(previous_title: str | None, previous_genre: str | None,
                     next_title: str, next_genre: str) -> str:
     """Short radio-DJ transition script (spoken aloud by the TTS service)."""
