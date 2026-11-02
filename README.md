@@ -205,9 +205,11 @@ cover prompt 2048, DJ script 1024). Regression tests cover both paths.
 > [scripts/verification_checklist.md](scripts/verification_checklist.md).
 > Run it on a fresh ZIP deploy and move these bullets to ✅.
 
-## Decision Judgement - Jaxon's Perspective
+## Decision Judgement
 
-My first jazz song was honestly a banger. It was something I'd actually listen to, which made me want to keep trying different genres and moods to see what else I could make. Having its own cover art and a DJ introduce it made it even cooler. That first song was what got me excited about the project.
+**Jaxon:**
+
+> My first jazz song was honestly a banger. It was something I'd actually listen to, which made me want to keep trying different genres and moods to see what else I could make. Having its own cover art and a DJ introduce it made it even cooler. That first song was what got me excited about the project.
 
 ## Design judgment
 
