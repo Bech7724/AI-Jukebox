@@ -154,3 +154,7 @@ For a local packaging check, `python scripts/make_zip.py` builds `dist/ai-jukebo
 **Jaxon:**
 
 > My first jazz song was honestly a banger. It was something I'd actually listen to, which made me want to keep trying different genres and moods to see what else I could make. Having its own cover art and a DJ introduce it made it even cooler. That first song was what got me excited about the project.
+
+**Jameson:**
+
+> When I first opened the site it worked, but it looked like every other AI-generated page, so I focused on making it feel like an actual jukebox. We switched to a dark theme with a turntable that spins up when music plays, cut song creation down to one "describe your song" box with mood chips, and added a live status card so you can see what step your song is on instead of waiting on a spinner. My favorite part is the background pulsing like a nightclub while a song plays. It makes the whole thing feel alive.
