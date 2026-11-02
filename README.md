@@ -162,3 +162,9 @@ For a local packaging check, `python scripts/make_zip.py` builds `dist/ai-jukebo
 **Seamus:**
 
 > My favorite part of playing with the jukebox was how little musical knowledge you need to get started. You can describe a vibe and let the AI handle the song, lyrics and cover art. I thought the DJ introductions were a cool touch as well because they tie the tracks together like a radio host would. I also think it’s a little scary how closely AI can match what you had in your head from a simple description. It reminded me of how music algorithms feed you songs they think you’ll like without you specifically searching for them. You still choose what to play, but it makes you wonder how much of your taste is your own and how much is shaped by what keeps getting put in front of you.
+
+**Adam:**
+
+The choice I tested was mixing the DJ show into one continuous WAV instead of playing the speech and songs in separate players. I built a three-track show, which took about 1:30 to build. I listened through it and used both Next and Prev to jump between segments. Prev took me back to the previous DJ intro as expected. The DJ never talked over a beat: each intro finished, then the song started, and then the next intro came in. Because the order is baked into one audio file, there’s nothing to go out of sync during playback.
+
+The limitation I ran into was that musical settings are suggestions, not rules. I generated a trap beat (dark, aggressive, energy 8, 30 seconds) and then the same description at 180 BPM. Each song took about 2 minutes. At 180 BPM, the tempo wasn’t steady and the song drifted out of trap and into something closer to rock. Even my instrumental version had vocal sounds mixed into the beat. What I learned is that the app can send the right request, but ACE-Step decides how closely to follow it, so extreme settings like a high BPM are more likely to pull the song away from the genre you asked for.
