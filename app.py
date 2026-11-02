@@ -592,32 +592,51 @@ body { background: #0c0a12 !important; }
 gradio-app { background: transparent !important; }
 
 /* ---- scroll-driven background: one glow layer per section, cross-faded ---- */
-.jk-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+/* Club lighting: the whole glow slowly cycles hue, the active layer thumps on a
+   beat (slow when idle, ~120 BPM while music plays), and two light beams sweep
+   up from the floor. The beat is soft and at most 2 per second, so it never strobes. */
+.jk-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  animation: jk-club-hue 14s ease-in-out infinite alternate; }
 .jk-bg-layer { position: absolute; inset: -15%; opacity: 0;
   transition: opacity 1.2s ease;
   transform: translate3d(0, calc(var(--jk-p, 0) * -80px), 0);
   animation: jk-drift 26s ease-in-out infinite alternate; }
-.jk-bg-layer.on { opacity: 1; }
+.jk-bg-layer.on { opacity: 1;
+  animation: jk-drift 26s ease-in-out infinite alternate, jk-thump 2.2s cubic-bezier(.2, .7, .3, 1) infinite; }
+.jk-bg::before { content: ""; position: absolute; inset: -10% -10% 0; pointer-events: none;
+  transform-origin: 50% 100%; mix-blend-mode: screen;
+  background:
+    conic-gradient(from 196deg at 12% 108%, transparent 0deg, rgba(255, 79, 139, 0.16) 7deg, transparent 15deg),
+    conic-gradient(from 150deg at 88% 108%, transparent 0deg, rgba(79, 227, 255, 0.13) 6deg, transparent 13deg),
+    conic-gradient(from 172deg at 50% 112%, transparent 0deg, rgba(255, 181, 71, 0.08) 5deg, transparent 11deg);
+  animation: jk-sweep 9s ease-in-out infinite alternate; }
+@keyframes jk-club-hue { from { filter: hue-rotate(-25deg) saturate(1.1); } to { filter: hue-rotate(40deg) saturate(1.35); } }
+@keyframes jk-thump { 0% { scale: 1; filter: brightness(1); } 12% { scale: 1.06; filter: brightness(1.7); }
+  100% { scale: 1; filter: brightness(1); } }
+@keyframes jk-sweep { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
 .jk-bg-layer[data-sec=top] { background:
-  radial-gradient(42% 38% at 22% 12%, rgba(255, 79, 139, 0.20), transparent 70%),
-  radial-gradient(38% 34% at 82% 8%, rgba(79, 227, 255, 0.12), transparent 70%); }
+  radial-gradient(42% 38% at 22% 12%, rgba(255, 79, 139, 0.28), transparent 70%),
+  radial-gradient(38% 34% at 82% 8%, rgba(79, 227, 255, 0.17), transparent 70%); }
 .jk-bg-layer[data-sec=studio] { background:
-  radial-gradient(44% 40% at 18% 30%, rgba(255, 122, 89, 0.18), transparent 70%),
-  radial-gradient(40% 36% at 85% 60%, rgba(255, 181, 71, 0.12), transparent 70%); }
+  radial-gradient(44% 40% at 18% 30%, rgba(255, 122, 89, 0.25), transparent 70%),
+  radial-gradient(40% 36% at 85% 60%, rgba(255, 181, 71, 0.17), transparent 70%); }
 .jk-bg-layer[data-sec=booth] { background:
-  radial-gradient(46% 42% at 80% 25%, rgba(224, 48, 108, 0.24), transparent 70%),
-  radial-gradient(42% 40% at 15% 70%, rgba(139, 92, 246, 0.18), transparent 70%); }
+  radial-gradient(46% 42% at 80% 25%, rgba(224, 48, 108, 0.32), transparent 70%),
+  radial-gradient(42% 40% at 15% 70%, rgba(139, 92, 246, 0.25), transparent 70%); }
 .jk-bg-layer[data-sec=library] { background:
-  radial-gradient(44% 40% at 25% 35%, rgba(79, 227, 255, 0.15), transparent 70%),
-  radial-gradient(40% 36% at 80% 75%, rgba(61, 220, 151, 0.11), transparent 70%); }
+  radial-gradient(44% 40% at 25% 35%, rgba(79, 227, 255, 0.21), transparent 70%),
+  radial-gradient(40% 36% at 80% 75%, rgba(61, 220, 151, 0.16), transparent 70%); }
 .jk-bg::after { content: ""; position: absolute; inset: -50%; opacity: 0.06; pointer-events: none;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   animation: jk-grain 0.9s steps(5) infinite; }
 @keyframes jk-grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); }
   40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } }
 @keyframes jk-drift { from { background-position: 0 0; translate: 0 0; } to { translate: 3% 2%; } }
-html.jk-playing .jk-bg { animation: jk-breathe 3.2s ease-in-out infinite; }
-@keyframes jk-breathe { 50% { opacity: 0.7; } }
+/* While music plays the room heats up: faster hue cycle, beat at ~120 BPM, faster beams.
+   !important because Gradio's container-prefixed copies of the base rules outrank these. */
+html.jk-playing .jk-bg { animation-duration: 5s !important; }
+html.jk-playing .jk-bg-layer.on { animation-duration: 26s, 0.5s !important; }
+html.jk-playing .jk-bg::before { animation-duration: 3.5s !important; }
 
 /* ---- reveal on scroll (class added by _HEAD_JS only when motion is allowed) ---- */
 html.jk-anim .jk-panel, html.jk-anim .jk-section { opacity: 0; transform: translateY(18px);
@@ -884,7 +903,7 @@ button.primary:disabled { opacity: 0.6; transform: none; box-shadow: none; curso
 
 @media (prefers-reduced-motion: reduce) {
   .jk-record, .jk-word, .jk-hero-sub, .jk-hero-cta, .jk-meta, .jk-turntable, .jk-ticker-track,
-  .jk-onair::before, .jk-card-pending .jk-card-art, .jk-bg, .jk-bg-layer, .jk-bg::after,
+  .jk-onair::before, .jk-card-pending .jk-card-art, .jk-bg, .jk-bg-layer, .jk-bg::after, .jk-bg::before,
   .jk-nav-live i { animation: none !important; }
   .jk-bg-layer { transition: none; transform: none; }
   html { scroll-behavior: auto; }
