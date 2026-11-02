@@ -157,4 +157,4 @@ For a local packaging check, `python scripts/make_zip.py` builds `dist/ai-jukebo
 
 **Jameson:**
 
-> When I first opened the site it worked, but it looked like every other AI-generated page, so I focused on making it feel like an actual jukebox. We switched to a dark theme with a turntable that spins up when music plays, cut song creation down to one "describe your song" box with mood chips, and added a live status card so you can see what step your song is on instead of waiting on a spinner. My favorite part is the background pulsing like a nightclub while a song plays. It makes the whole thing feel alive.
+> Our first site worked, but it looked like every other AI-generated page, so we focused on making it feel like an actual jukebox. We switched to a dark theme with a turntable that spins up when music plays, cut song creation down to one "describe your song" box with mood chips, and added a live status card so you can see what step your song is on instead of waiting on a spinner. My favorite part is the background pulsing like a nightclub while a song plays. It makes the whole thing feel alive.
