@@ -207,7 +207,7 @@ cover prompt 2048, DJ script 1024). Regression tests cover both paths.
 
 ## Decision Judgement - Jaxon's Perspective
 
-I preferred the lighter Boulder-inspired colors because the earlier dark layout made the controls harder to read. Grouping the song settings, queue, and library into numbered sections made the steps easier to follow. I also liked combining the DJ speech and music into one file so playback could continue without overlapping audio. The rubric review caught a bug that ignored the selected song order. Getting that fixed with AI assistance showed me why testing the actual behavior matters, even when the interface looks finished.
+My first jazz song was honestly a banger. It was something I'd actually listen to, which made me want to keep trying different genres and moods to see what else I could make. Having its own cover art and a DJ introduce it made it even cooler. That first song was what got me excited about the project.
 
 ## Design judgment
 
