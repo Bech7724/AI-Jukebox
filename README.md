@@ -207,7 +207,7 @@ cover prompt 2048, DJ script 1024). Regression tests cover both paths.
 
 ## Decision Judgement - Jaxon's Perspective
 
-I think this project is cool because it turns a song idea into a custom radio show, complete with music, cover art, and an AI DJ. I helped shape the dashboard and used AI assistance to build and improve it. I especially like the Boulder-inspired design and continuous playback. Checking the rubric and fixing the queue order taught me that the app needs to work as clearly as it looks.
+I preferred the lighter Boulder-inspired colors because the earlier dark layout made the controls harder to read. Grouping the song settings, queue, and library into numbered sections made the steps easier to follow. I also liked combining the DJ speech and music into one file so playback could continue without overlapping audio. The rubric review caught a bug that ignored the selected song order. Getting that fixed with AI assistance showed me why testing the actual behavior matters, even when the interface looks finished.
 
 ## Design judgment
 
