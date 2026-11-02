@@ -9,7 +9,8 @@ for agentic use and is **never** used by this app.
 
 ## Live demo
 
-🔗 **https://0eb425eefa9b5ec528.gradio.live** — the app currently running.
+🔗 **https://f06514d2aa3ac0f900.gradio.live** — refreshed November 1, 2026; hosted on the local Mac.
+The Mac must remain awake and the app process must remain running.
 
 > Share links rotate: this public URL dies with the app process and expires
 > automatically (~1 week). When it stops working, refresh it by launching
