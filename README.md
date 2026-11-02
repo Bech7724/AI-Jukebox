@@ -4,7 +4,7 @@ Create vocal or instrumental songs with matching cover art, then arrange them in
 
 ## Live demo
 
-[Open AI Jukebox](https://877d4c98c7dfcf741f.gradio.live/)
+[Open AI Jukebox](https://619e96e27bedb9d84c.gradio.live/)
 
 This temporary Gradio link runs from a teammate's Mac, so it only works while that Mac is awake and the app process is running, and it expires after about one week. Restart with `AIJ_SHARE=1 python app.py` and update this link when needed. Visitors share one library. The downloadable app is the version to submit for independent testing.
 
