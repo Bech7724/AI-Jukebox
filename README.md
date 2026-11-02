@@ -158,3 +158,7 @@ For a local packaging check, `python scripts/make_zip.py` builds `dist/ai-jukebo
 **Jameson:**
 
 > Our first site worked, but it looked like every other AI-generated page, so we focused on making it feel like an actual jukebox. We switched to a dark theme with a turntable that spins up when music plays, cut song creation down to one "describe your song" box with mood chips, and added a live status card so you can see what step your song is on instead of waiting on a spinner. My favorite part is the background pulsing like a nightclub while a song plays. It makes the whole thing feel alive.
+
+**Seamus:**
+
+> My favorite part of playing with the jukebox was how little musical knowledge you need to get started. You can describe a vibe and let the AI handle the song, lyrics and cover art. I thought the DJ introductions were a cool touch as well because they tie the tracks together like a radio host would. I also think it’s a little scary how closely AI can match what you had in your head from a simple description. It reminded me of how music algorithms feed you songs they think you’ll like without you specifically searching for them. You still choose what to play, but it makes you wonder how much of your taste is your own and how much is shaped by what keeps getting put in front of you.
